@@ -179,8 +179,8 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
     compute_Gs(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
     compute_y1y1h(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
   }
-  else if (t+last_h_step+h_step>200.0){
-    h_step = 200.0-(t+last_h_step);
+  else if (t+last_h_step+h_step>T_final){
+    h_step = T_final-(t+last_h_step);
   }
 }
 
@@ -216,7 +216,7 @@ void rk4::dense_output(double t_){
   int m2 = int((t_+last_h_step)/dense_stpsze);
   for (int k=(m1+1); k<(m2+1); k++){
     char filenameDense[32];
-    sprintf(filenameDense, "DenseQ5a%04d_iii.txt", k);
+    sprintf(filenameDense, "Dense%04d.txt", k);
     hermite(t_, (dense_stpsze*k-t_)/last_h_step, filenameDense);
   }
 }
