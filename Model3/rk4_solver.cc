@@ -10,7 +10,23 @@
 #include <omp.h>
 
 void rk4::find_square(double x, double y, bool nlim){
-  //xlim_next[1] = nlim*(((y>ylim[1])&&(x<xlim[1])))
+  bool y_geq = y>ylim[1];
+  bool x_leq = x<xlim[1];
+  location = ( y_geq &&  x_leq)*7
+            +( y_geq && !x_leq)*8
+            +(!y_geq &&  x_leq)*9
+            +(!y_geq && !x_leq)*10;
+  xlim_next[1] = nlim*( (  x_leq *0.5*(xlim[0]+xlim[1]))
+                       +((!x_leq)*0.5*(xlim[1]+xlim[2])))
+                + !nlim * xlim_next[1];
+  xlim_next[0] = nlim*((!x_leq)?xlim[1]:xlim_next[0]) + !nlim * xlim_next[0];
+  xlim_next[2] = nlim*( x_leq  ?xlim[1]:xlim_next[2]) + !nlim * xlim_next[2];
+  ylim_next[1] = nlim*( (  y_geq *0.5*(ylim[1]+ylim[2]))
+                       +((!y_geq)*0.5*(ylim[0]+ylim[1])))
+                + !nlim * ylim_next[1];
+  ylim_next[0] = nlim*(  y_geq ?ylim[1]:ylim_next[0]) + !nlim * ylim_next[0];
+  ylim_next[2] = nlim*((!y_geq)?ylim[1]:ylim_next[2]) + !nlim * ylim_next[2];
+/*
   if (y>ylim[1]){
     if (x<xlim[1]){
       location = 6;
@@ -43,9 +59,10 @@ void rk4::find_square(double x, double y, bool nlim){
       ylim_next[1]=nlim*0.5*(ylim[1]+ylim[0]) + !nlim*ylim_next[1];
     }
   }
+*/
 }
 
-inline void rk4::push_node(double x_, double y_, double sint_, double cost_){
+inline void rk4::push_node(int i, double x_, double y_, double sint_, double cost_){
   // Every new pushed node is a value node.
   barnes_list.push_back(1);
 
@@ -55,6 +72,7 @@ inline void rk4::push_node(double x_, double y_, double sint_, double cost_){
   barnes_list.push_back(y_);
   barnes_list.push_back(sint_);
   barnes_list.push_back(cost_);
+  barnes_list.push_back(i);
   barnes_list.push_back(-1);
   barnes_list.push_back(-1);
   barnes_list.push_back(-1);
@@ -75,6 +93,40 @@ inline void rk4::init_lims(){
   }
 }
 
+void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
+                         double &sumx, double &sumy, double &sumtheta, int &N_comp){
+  double mx=barnes_list[cidx+2], my=barnes_list[cidx+3],
+         msin=barnes_list[cidx+4], mcos=barnes_list[cidx+5];
+  int val = (int) barnes_list[cidx], nchd=(int) barnes_list[cidx+1],
+      pid = (int) barnes_list[cidx+6], n1=(int) barnes_list[cidx+7],
+      n2=(int) barnes_list[cidx+8], n3=(int) barnes_list[cidx+9],
+      n4=(int) barnes_list[cidx+10];
+  double norm2 = (xi-mx)*(xi-mx) + (yi-my)*(yi-my);
+  double norm = sqrt(norm2);
+
+  if (val==1){
+    if (i != pid){
+      sumx += ((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2);
+      sumy += ((my-yi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((my-yi)/norm2);
+      sumtheta += (msin*cos(thi)-sin(thi)*mcos)/norm;
+      N_comp += nchd;
+    }
+  }
+  else{
+    if ((2./dist)>barnes_theta){
+      if (n1!=-1) barnes_compute(n1,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
+      if (n2!=-1) barnes_compute(n2,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
+      if (n3!=-1) barnes_compute(n3,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
+      if (n4!=-1) barnes_compute(n4,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
+    }
+    else{
+      sumx += ((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2);
+      sumy += ((my-yi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((my-yi)/norm2);
+      sumtheta += (msin*cos(thi)-sin(thi)*mcos)/norm;
+      N_comp += nchd;
+    }
+  }
+}
 
 void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, double* outputX, double* outputY, double* output_theta){
 
@@ -82,17 +134,25 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
   barnes_list.clear();
   push_node(x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
   barnes_list[0] = 0;
-  barnes_list[(y_[0]>0)?((x_[0]<0)?6:7):((x_[0]<0)?8:9)] = barnes_list.size();
+  barnes_list[(y_[0]>0)?((x_[0]<0)?7:8):((x_[0]<0)?9:10)] = barnes_list.size();
   cidx = barnes_list.size();
-  push_node(x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
+  push_node(0, x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
 
   // Initialize xlim, ylim, xlim_next, ylim_next
   init_lims();
-
-  for(int i=1; i<N; i++){
+  /*
+  printf("Node or value | # of chdr | ave(x) | ave(y) | ave(sin(th)) | ave(cos(th)) | n1 | n2 | n3 | n4\n");
+  printf("For a:\n");
+  for (int i=0; i<(int) barnes_list.size();i++){
+    printf("%f ", barnes_list[i]);
+    if (fmod(i+1,SIZE_LIST)==0) printf("\n");
+  }
+  */
+  for(int i=1; i<4; i++){
     not_found = 1;
     cidx = 0;
     location = 0;
+    init_lims();
     do{
       // If the current node is a root :
       if (barnes_list[cidx] == 0){
@@ -104,7 +164,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
         // If child node is empty node, create the new node.
         if (barnes_list[fidx]==-1){
           barnes_list[fidx]=barnes_list.size();
-          push_node(x_[i],y_[i],sin(theta_[i]),cos(theta_[i]));
+          push_node(i, x_[i],y_[i],sin(theta_[i]),cos(theta_[i]));
 
           // We increment the number of children of this node
           barnes_list[cidx+1] += 1;
@@ -121,10 +181,19 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
         }
         // If child node not empty, navigate to this next node.
         else {
+          barnes_list[cidx+1] += 1;
+          N_child = barnes_list[cidx+1];
+          barnes_list[cidx+2] = ((N_child-1)*barnes_list[cidx+2] + x_[i])/N_child;
+          barnes_list[cidx+3] = ((N_child-1)*barnes_list[cidx+3] + y_[i])/N_child;
+          barnes_list[cidx+4] = ((N_child-1)*barnes_list[cidx+4] + sin(theta_[i]))/N_child;
+          barnes_list[cidx+5] = ((N_child-1)*barnes_list[cidx+5] + cos(theta_[i]))/N_child;
           cidx = barnes_list[fidx];
           xlim[0]=xlim_next[0];
           xlim[1]=xlim_next[1];
           xlim[2]=xlim_next[2];
+          ylim[0]=ylim_next[0];
+          ylim[1]=ylim_next[1];
+          ylim[2]=ylim_next[2];
         }
       }
 
@@ -136,18 +205,49 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
         oy = barnes_list[cidx+3];
         osint = barnes_list[cidx+4];
         ocost = barnes_list[cidx+5];
+        oid = barnes_list[cidx+6];
         barnes_list[cidx] = 0;
         find_square(ox,oy,0);
         barnes_list[cidx+location]=barnes_list.size();
-        push_node(ox, oy, osint, ocost);
+        push_node(oid, ox, oy, osint, ocost);
         // Note: current index "cidx" remains identical.
       }
+/*
+      printf("---\n");
+      printf("xlim[0]=%f xlim[1]=%f xlim[2]=%f\n",xlim[0],xlim[1],xlim[2]);
+      printf("ylim[0]=%f ylim[1]=%f ylim[2]=%f\n",ylim[0],ylim[1],ylim[2]);
+      for (long int j=0; j<barnes_list.size();j++){
+        printf("%f ", barnes_list[j]);
+        if (fmod(j+1,SIZE_LIST)==0) printf("\n");
+      }
+*/
     } while(not_found);
+    /*
+    if (i == 1) printf("For b:\n");
+    if (i == 2) printf("For c:\n");
+    if (i == 3) printf("For d:\n");
+    for (int j=0; j<(int) barnes_list.size();j++){
+      printf("%f ", barnes_list[j]);
+      if (fmod(j+1,SIZE_LIST)==0) printf("\n");
+    }
+    */
   }
-  for (int i=0; i<barnes_list.size();i++){
-    printf("%f ", barnes_list[i]);
-    if (fmod(i,SIZE_LIST)+1==0) printf("\n");
+
+  for(int i=0; i<4; i++){
+    cidx = 0;
+    outputX[i] = 0.;
+    outputY[i] = 0.;
+    output_theta[i] = 0.;
+    double sumx = 0.;
+    double sumy = 0.;
+    double sumtheta = 0.;
+    double N_comp = 0;
+    barnes_compute(0, i, x_[i], y_[i], theta_[i], sumx, sumy, sumtheta, N_comp);
+    outputX[i] += (1./float(N))*sumx;
+    outputY[i] += (1./float(N))*sumy;
+    output_theta[i] += (float(K)/float(N))*sumtheta;
   }
+
 /*
 #pragma omp parallel for
   for (int i=0; i<N; i++){

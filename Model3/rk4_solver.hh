@@ -30,11 +30,12 @@ class rk4 {
     // Futur index
     int fidx;
     int N_child;
-    const int SIZE_LIST;
+    int SIZE_LIST;
     double ox;
     double oy;
     double osint;
     double ocost;
+    double oid;
     double* A;
     double* B;
     double* C;
@@ -57,7 +58,9 @@ class rk4 {
     double* sc_x;
     double* sc_y;
     double* sc_theta;
-    vector<double> barnes_list;
+    double* bnodes_idx;
+    std::vector<double> barnes_list;
+    std::vector<double> bnodes;
     double* xlim;
     double* ylim;
     double* xlim_next;
@@ -74,7 +77,7 @@ class rk4 {
       n_intvls = n_intvls_;
       not_found = 1;
       barnes_theta = barnes_theta_;
-      SIZE_LIST = 10;
+      SIZE_LIST = 11;
       x0 = new double[N];
       y0 = new double[N];
       theta0 = new double[N];
@@ -94,6 +97,7 @@ class rk4 {
       ylim = new double[3];
       xlim_next = new double[3];
       ylim_next = new double[3];
+      bnodes_idx = new double[N];
       Rtol = tol;
       Atol = tol;
       fac = 0.9;
@@ -182,6 +186,7 @@ class rk4 {
       zap(ylim);
       zap(xlim_next);
       zap(ylim_next);
+      zap(bnodes_idx);
       std::cout<<"Class successfully terminated.\n";
     };
     void smart_compute_xx(double t_, double* x_, double* y_, double* theta_,
