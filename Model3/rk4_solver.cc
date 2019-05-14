@@ -233,6 +233,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
     */
   }
 
+#pragma omp parallel for
   for(int i=0; i<N; i++){
     cidx = 0;
     outputX[i] = 0.;
