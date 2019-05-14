@@ -31,6 +31,10 @@ class rk4 {
     int fidx;
     int N_child;
     int SIZE_LIST;
+    double minx;
+    double maxx;
+    double miny;
+    double maxy;
     double ox;
     double oy;
     double osint;

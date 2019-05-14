@@ -7,13 +7,13 @@
 #include <omp.h>
 
 int main(){
-  double T_final = 200.0;
-  double hi_step = 1;
+  double T_final = 50.0;
+  double hi_step = 0.05;
   double tolerance = 0.000001;
   double J = 0.1;
   double K = 1;
   double N_intrvls = 5;
-  rk4 myRk4(hi_step, tolerance, J, K, N_intrvls,0.02);
+  rk4 myRk4(hi_step, tolerance, J, K, N_intrvls,0.5);
   double t1 = omp_get_wtime();
   myRk4.compute_solution(T_final);
   double t2 = omp_get_wtime();

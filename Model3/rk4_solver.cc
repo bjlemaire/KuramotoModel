@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include <omp.h>
+#include <cfloat>
 
 void rk4::find_square(double x, double y, bool nlim){
   bool y_geq = y>ylim[1];
@@ -47,12 +48,12 @@ inline void rk4::push_node(int i, double x_, double y_, double sint_, double cos
 
 
 inline void rk4::init_lims(){
-  xlim[0] = -1.;
-  xlim[1] = 0.;
-  xlim[2] = 1.;
-  ylim[0] = -1.;
-  ylim[1] = 0.;
-  ylim[2] = 1.;
+  xlim[0] = minx-0.01*(maxx-minx);
+  xlim[1] = 0.5*(minx+maxx);
+  xlim[2] = maxx+0.01*(maxx-minx);
+  ylim[0] = miny-0.01*(maxy-miny);
+  ylim[1] = 0.5*(miny+maxy);
+  ylim[2] = maxy+0.01*(maxy-miny);
   for (int i=0;i<3;i++){
     xlim_next[i] = xlim[i];
     ylim_next[i] = ylim[i];
@@ -103,7 +104,16 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
   barnes_list[(y_[0]>0)?((x_[0]<0)?7:8):((x_[0]<0)?9:10)] = barnes_list.size();
   cidx = barnes_list.size();
   push_node(0, x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
-
+  minx=DBL_MAX;
+  maxx=-DBL_MAX;
+  miny=DBL_MAX;
+  maxy=-DBL_MAX;
+  for (int i=0; i<N; i++){
+    minx = (x_[i]<minx)?x_[i]:minx;
+    maxx = (x_[i]>maxx)?x_[i]:maxx;
+    miny = (y_[i]<miny)?y_[i]:miny;
+    maxy = (y_[i]>maxy)?y_[i]:maxy;
+  }
   // Initialize xlim, ylim, xlim_next, ylim_next
   init_lims();
   
@@ -345,6 +355,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
       theta1h[i] += B[j+4]*h_step*ff_theta[i+j*N];
     }
   }
+  /*
   for (int i=0; i<N; i++){
     sc_x[i] = Atol + Rtol * std::max(std::abs(x0[i]), std::abs(x1[i]));
     sc_y[i] = Atol + Rtol * std::max(std::abs(y0[i]), std::abs(y1[i]));
@@ -363,7 +374,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   err = sqrt(err);
   last_h_step = h_step;
   h_step = h_step * std::min(facmax, std::max(facmin, fac*pow((1./err), (1./4.))));
-
+  
 
   if (err>1){
     compute_Gs(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
@@ -372,6 +383,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   else if (t+last_h_step+h_step>T_final){
     h_step = T_final-(t+last_h_step);
   }
+  */
 }
 
 void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
