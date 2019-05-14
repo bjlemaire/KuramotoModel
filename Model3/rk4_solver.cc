@@ -95,12 +95,12 @@ inline void rk4::init_lims(){
 
 void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
                          double &sumx, double &sumy, double &sumtheta, int &N_comp){
-  double mx=barnes_list[cidx+2], my=barnes_list[cidx+3],
-         msin=barnes_list[cidx+4], mcos=barnes_list[cidx+5];
-  int val = (int) barnes_list[cidx], nchd=(int) barnes_list[cidx+1],
-      pid = (int) barnes_list[cidx+6], n1=(int) barnes_list[cidx+7],
-      n2=(int) barnes_list[cidx+8], n3=(int) barnes_list[cidx+9],
-      n4=(int) barnes_list[cidx+10];
+  double mx=barnes_list[cidx_+2], my=barnes_list[cidx_+3],
+         msin=barnes_list[cidx_+4], mcos=barnes_list[cidx_+5];
+  int val = (int) barnes_list[cidx_], nchd=(int) barnes_list[cidx_+1],
+      pid = (int) barnes_list[cidx_+6], n1=(int) barnes_list[cidx_+7],
+      n2=(int) barnes_list[cidx_+8], n3=(int) barnes_list[cidx_+9],
+      n4=(int) barnes_list[cidx_+10];
   double norm2 = (xi-mx)*(xi-mx) + (yi-my)*(yi-my);
   double norm = sqrt(norm2);
 
@@ -113,11 +113,11 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
     }
   }
   else{
-    if ((2./dist)>barnes_theta){
-      if (n1!=-1) barnes_compute(n1,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
-      if (n2!=-1) barnes_compute(n2,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
-      if (n3!=-1) barnes_compute(n3,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
-      if (n4!=-1) barnes_compute(n4,i,xi,y1,thi,sumx,sumy,sumtheta,N_comp);
+    if ((2./norm)>barnes_theta){
+      if (n1!=-1) barnes_compute(n1,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
+      if (n2!=-1) barnes_compute(n2,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
+      if (n3!=-1) barnes_compute(n3,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
+      if (n4!=-1) barnes_compute(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
     }
     else{
       sumx += ((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2);
@@ -132,7 +132,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
 
   // Create a fresh Barnes-Hut list
   barnes_list.clear();
-  push_node(x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
+  push_node(0, x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
   barnes_list[0] = 0;
   barnes_list[(y_[0]>0)?((x_[0]<0)?7:8):((x_[0]<0)?9:10)] = barnes_list.size();
   cidx = barnes_list.size();
@@ -148,7 +148,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
     if (fmod(i+1,SIZE_LIST)==0) printf("\n");
   }
   */
-  for(int i=1; i<4; i++){
+  for(int i=1; i<N; i++){
     not_found = 1;
     cidx = 0;
     location = 0;
@@ -233,7 +233,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
     */
   }
 
-  for(int i=0; i<4; i++){
+  for(int i=0; i<N; i++){
     cidx = 0;
     outputX[i] = 0.;
     outputY[i] = 0.;
@@ -241,11 +241,12 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
     double sumx = 0.;
     double sumy = 0.;
     double sumtheta = 0.;
-    double N_comp = 0;
+    int N_comp = 0;
     barnes_compute(0, i, x_[i], y_[i], theta_[i], sumx, sumy, sumtheta, N_comp);
-    outputX[i] += (1./float(N))*sumx;
-    outputY[i] += (1./float(N))*sumy;
-    output_theta[i] += (float(K)/float(N))*sumtheta;
+    outputX[i] = (1./float(N_comp))*sumx;
+    outputY[i] = (1./float(N_comp))*sumy;
+    output_theta[i] = (float(K)/float(N_comp))*sumtheta;
+    //printf("For i=%d, optX=%f, optY=%f, optTh=%f\n",i,outputX[i],outputY[i],output_theta[i]);
   }
 
 /*
@@ -321,7 +322,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
     Gs_theta[i+4*N]=theta0[i];
   }
   // Then, we compute f(G1):
-  compute_xx(t+C[0]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta);
+  smart_compute_xx(t+C[0]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta);
 
   // Calculating G2:
 #pragma omp parallel for
@@ -332,7 +333,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G2):
-  compute_xx(t+C[1]*h_step, (Gs_x+1*N), (Gs_y+1*N), (Gs_theta+1*N), (ff_x+1*N), (ff_y+1*N), (ff_theta+1*N));
+  smart_compute_xx(t+C[1]*h_step, (Gs_x+1*N), (Gs_y+1*N), (Gs_theta+1*N), (ff_x+1*N), (ff_y+1*N), (ff_theta+1*N));
 
   // Calculating G3:
   for (int i=0; i<N; i++){
@@ -345,7 +346,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G3):
-  compute_xx(t+C[2]*h_step, (Gs_x+2*N), (Gs_y+2*N), (Gs_theta+2*N), (ff_x+2*N), (ff_y+2*N), (ff_theta+2*N));
+  smart_compute_xx(t+C[2]*h_step, (Gs_x+2*N), (Gs_y+2*N), (Gs_theta+2*N), (ff_x+2*N), (ff_y+2*N), (ff_theta+2*N));
 
 
   // Calculating G4:
@@ -363,7 +364,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G4):
-  compute_xx(t+C[3]*h_step, (Gs_x+3*N), (Gs_y+3*N), (Gs_theta+3*N), (ff_x+3*N), (ff_y+3*N), (ff_theta+3*N));
+  smart_compute_xx(t+C[3]*h_step, (Gs_x+3*N), (Gs_y+3*N), (Gs_theta+3*N), (ff_x+3*N), (ff_y+3*N), (ff_theta+3*N));
 
 
   // Calculating G5:
@@ -384,7 +385,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G5):
-  compute_xx(t+C[4]*h_step, (Gs_x+4*N), (Gs_y+4*N), (Gs_theta+4*N), (ff_x+4*N), (ff_y+4*N), (ff_theta+4*N));
+  smart_compute_xx(t+C[4]*h_step, (Gs_x+4*N), (Gs_y+4*N), (Gs_theta+4*N), (ff_x+4*N), (ff_y+4*N), (ff_theta+4*N));
 }
 
 void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
@@ -465,8 +466,8 @@ void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
   double f1_x[N];
   double f1_y[N];
   double f1_theta[N];
-  compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
-  compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
+  smart_compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
+  smart_compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
 
   for(int i=0; i<N; i++){
     double u_x = (1-myTheta)*x0[i] + myTheta*x1[i] + myTheta*(myTheta-1)*((1-2*myTheta)*(x1[i]-x0[i]) + (myTheta-1)*last_h_step*f0_x[i]+myTheta*last_h_step*f1_x[i]);

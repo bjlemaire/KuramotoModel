@@ -189,11 +189,13 @@ class rk4 {
       zap(bnodes_idx);
       std::cout<<"Class successfully terminated.\n";
     };
+    void barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
+                         double &sumx, double &sumy, double &sumtheta, int &N_comp);
     void smart_compute_xx(double t_, double* x_, double* y_, double* theta_,
                           double* outputX, double* outputY, double* output_theta );
     inline void init_lims();
     void find_square(double x, double y, bool nlim);
-    inline void push_node(double x_, double y_, double sint_, double cost_);
+    inline void push_node(int i, double x_, double y_, double sint_, double cost_);
 
 
 };
