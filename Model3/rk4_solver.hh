@@ -191,7 +191,7 @@ class rk4 {
       zap(xlim_next);
       zap(ylim_next);
       zap(bnodes_idx);
-      std::cout<<"Class successfully terminated.\n";
+      //std::cout<<"Class successfully terminated.\n";
     };
     void barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
                          double &sumx, double &sumy, double &sumtheta, int &N_comp);

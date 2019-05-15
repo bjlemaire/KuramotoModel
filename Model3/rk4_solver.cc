@@ -447,18 +447,18 @@ void rk4::compute_solution(double T_final_){
     compute_y1y1h(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
     dense_output(t);
     t += last_h_step;
-    printf("t=%f, next_step=%f\n", t, h_step);
+    //printf("t=%f, next_step=%f\n", t, h_step);
     step_counter += 1;
     nextStep();
   };
-  printf("Done! It tool us %d steps to perform the entire integration.", step_counter);
+  //printf("Done! It tool us %d steps to perform the entire integration.", step_counter);
 }
 
 void rk4::initialize(){
   srand (static_cast <unsigned> (time(0)));
   float max_xy = 2;
   float max_angle = 2*M_PI;
-  printf("N=%d\n", N);
+  //printf("N=%d\n", N);
   for(int i=0; i<N; i++){
     float x;
     float y;
