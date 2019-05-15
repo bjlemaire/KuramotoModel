@@ -4,71 +4,25 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
-#define N 1250
+//#define N 1250
 
 class rk4 {
   public:
-    double AA;
-    double BB;
-    double J;
-    double K;
-    double h_step;
-    double last_h_step;
-    double Atol;
-    double Rtol;
-    double fac;
-    double facmin;
-    double facmax;
-    double T_final;
-    int n_intvls;
-    double dense_stpsze;
-    double barnes_theta;
-    int not_found;
-    int location;
-    // Current index
-    int cidx;
-    // Futur index
-    int fidx;
-    int N_child;
-    int SIZE_LIST;
-    double ox;
-    double oy;
-    double osint;
-    double ocost;
-    double oid;
-    double* A;
-    double* B;
-    double* C;
-    double* sc;
-    double* x0;
-    double* y0;
-    double* theta0;
-    double* vx0;
-    double* vy0;
-    double* omega0;
-    double* x1;
-    double* y1;
-    double* theta1;
-    double* x1h;
-    double* y1h;
-    double* theta1h;
-    double* vx1;
-    double* vy1;
-    double* omega1;
-    double* sc_x;
-    double* sc_y;
-    double* sc_theta;
-    double* bnodes_idx;
+    bool enable_BH;
+    double AA, BB, J, K, h_step, last_h_step, Atol, Rtol, fac, facmin, facmax, T_final,
+           dense_stpsze, barnes_theta, minx, maxx, miny, maxy, ox, oy, osint, ocost, oid;
+    // cidx: Current Index
+    // fidx: Futur Index
+    int N, n_intvls, not_found, location, cidx, fidx, N_child, step_counter, SIZE_LIST;
+    double *A, *B, *C, *sc, *x0, *y0, *theta0, *vx0, *vy0, *omega0, *x1, *y1, *theta1,
+           *x1h, *y1h, *theta1h, *vx1, *vy1, *omega1, *sc_x, *sc_y, *sc_theta, *bnodes_idx,
+           *xlim, *ylim, *xlim_next, *ylim_next;
     std::vector<double> barnes_list;
     std::vector<double> bnodes;
-    double* xlim;
-    double* ylim;
-    double* xlim_next;
-    double* ylim_next;
-    int step_counter;
 
-
-    rk4(double hi_step, double tol, double J_, double K_, int n_intvls_, double barnes_theta_){
+    rk4(int N_, double hi_step, double tol, double J_, double K_, int n_intvls_, double barnes_theta_, bool enable_BH_){
+      N = N_;
+      enable_BH = enable_BH_;
       AA = 1.;
       BB = 1.;
       J  = J_;
@@ -187,10 +141,10 @@ class rk4 {
       zap(xlim_next);
       zap(ylim_next);
       zap(bnodes_idx);
-      std::cout<<"Class successfully terminated.\n";
+      //std::cout<<"Class successfully terminated.\n";
     };
     void barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
-                         double &sumx, double &sumy, double &sumtheta, int &N_comp);
+                         double &sumx, double &sumy, double &sumtheta, int &N_comp, double lgth);
     void smart_compute_xx(double t_, double* x_, double* y_, double* theta_,
                           double* outputX, double* outputY, double* output_theta );
     inline void init_lims();

@@ -8,7 +8,6 @@
 #include <fstream>
 #include <string>
 #include <omp.h>
-#include <cfloat>
 
 void rk4::find_square(double x, double y, bool nlim){
   bool y_geq = y>ylim[1];
@@ -48,14 +47,12 @@ inline void rk4::push_node(int i, double x_, double y_, double sint_, double cos
 
 
 inline void rk4::init_lims(){
-  double low_  = fmin(minx-0.01*(maxx-minx), miny-0.01*(maxy-miny));
-  double high_ = fmax(maxx+0.01*(maxx-minx), maxy+0.01*(maxy-miny));
-  xlim[0] = low_;
-  xlim[1] = 0.5*(low_+high_);
-  xlim[2] = high_;
-  ylim[0] = low_;
-  ylim[1] = 0.5*(low_+high_);
-  ylim[2] = high_;
+  xlim[0] = -1.;
+  xlim[1] = 0.;
+  xlim[2] = 1.;
+  ylim[0] = -1.;
+  ylim[1] = 0.;
+  ylim[2] = 1.;
   for (int i=0;i<3;i++){
     xlim_next[i] = xlim[i];
     ylim_next[i] = ylim[i];
@@ -63,8 +60,7 @@ inline void rk4::init_lims(){
 }
 
 void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
-                         double &sumx, double &sumy, double &sumtheta, int &N_comp, 
-                         double lgth){
+                         double &sumx, double &sumy, double &sumtheta, int &N_comp){
   double mx=barnes_list[cidx_+2], my=barnes_list[cidx_+3],
          msin=barnes_list[cidx_+4], mcos=barnes_list[cidx_+5];
   int val = (int) barnes_list[cidx_], nchd=(int) barnes_list[cidx_+1],
@@ -83,11 +79,11 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
     }
   }
   else{
-    if ((lgth/norm)>barnes_theta){
-      if (n1!=-1) barnes_compute(n1,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
-      if (n2!=-1) barnes_compute(n2,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
-      if (n3!=-1) barnes_compute(n3,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
-      if (n4!=-1) barnes_compute(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
+    if ((2./norm)>barnes_theta){
+      if (n1!=-1) barnes_compute(n1,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
+      if (n2!=-1) barnes_compute(n2,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
+      if (n3!=-1) barnes_compute(n3,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
+      if (n4!=-1) barnes_compute(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp);
     }
     else{
       sumx += ((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2);
@@ -107,16 +103,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
   barnes_list[(y_[0]>0)?((x_[0]<0)?7:8):((x_[0]<0)?9:10)] = barnes_list.size();
   cidx = barnes_list.size();
   push_node(0, x_[0],y_[0],sin(theta_[0]),cos(theta_[0]));
-  minx=DBL_MAX;
-  maxx=-DBL_MAX;
-  miny=DBL_MAX;
-  maxy=-DBL_MAX;
-  for (int i=0; i<N; i++){
-    minx = (x_[i]<minx)?x_[i]:minx;
-    maxx = (x_[i]>maxx)?x_[i]:maxx;
-    miny = (y_[i]<miny)?y_[i]:miny;
-    maxy = (y_[i]>maxy)?y_[i]:maxy;
-  }
+
   // Initialize xlim, ylim, xlim_next, ylim_next
   init_lims();
   
@@ -197,7 +184,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
     double sumy = 0.;
     double sumtheta = 0.;
     int N_comp = 0;
-    barnes_compute(0, i, x_[i], y_[i], theta_[i], sumx, sumy, sumtheta, N_comp, maxx-minx);
+    barnes_compute(0, i, x_[i], y_[i], theta_[i], sumx, sumy, sumtheta, N_comp);
     outputX[i] = (1./float(N_comp))*sumx;
     outputY[i] = (1./float(N_comp))*sumy;
     output_theta[i] = (float(K)/float(N_comp))*sumtheta;
@@ -358,7 +345,6 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
       theta1h[i] += B[j+4]*h_step*ff_theta[i+j*N];
     }
   }
-  /*
   for (int i=0; i<N; i++){
     sc_x[i] = Atol + Rtol * std::max(std::abs(x0[i]), std::abs(x1[i]));
     sc_y[i] = Atol + Rtol * std::max(std::abs(y0[i]), std::abs(y1[i]));
@@ -377,7 +363,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   err = sqrt(err);
   last_h_step = h_step;
   h_step = h_step * std::min(facmax, std::max(facmin, fac*pow((1./err), (1./4.))));
-  
+
 
   if (err>1){
     compute_Gs(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
@@ -386,7 +372,6 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   else if (t+last_h_step+h_step>T_final){
     h_step = T_final-(t+last_h_step);
   }
-  */
 }
 
 void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
@@ -450,18 +435,18 @@ void rk4::compute_solution(double T_final_){
     compute_y1y1h(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
     dense_output(t);
     t += last_h_step;
-    //printf("t=%f, next_step=%f\n", t, h_step);
+    printf("t=%f, next_step=%f\n", t, h_step);
     step_counter += 1;
     nextStep();
   };
-  //printf("Done! It tool us %d steps to perform the entire integration.", step_counter);
+  printf("Done! It tool us %d steps to perform the entire integration.", step_counter);
 }
 
 void rk4::initialize(){
   srand (static_cast <unsigned> (time(0)));
   float max_xy = 2;
   float max_angle = 2*M_PI;
-  //printf("N=%d\n", N);
+  printf("N=%d\n", N);
   for(int i=0; i<N; i++){
     float x;
     float y;

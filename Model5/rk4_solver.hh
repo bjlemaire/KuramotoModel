@@ -8,8 +8,7 @@
 
 class rk4 {
   public:
-    double AA, BB, J, K, h_step, last_h_step, Atol, Rtol, fac, facmin, facmax, T_final;
-    /*
+    double AA;
     double BB;
     double J;
     double K;
@@ -21,7 +20,6 @@ class rk4 {
     double facmin;
     double facmax;
     double T_final;
-    */
     int n_intvls;
     double dense_stpsze;
     double barnes_theta;
@@ -33,10 +31,6 @@ class rk4 {
     int fidx;
     int N_child;
     int SIZE_LIST;
-    double minx;
-    double maxx;
-    double miny;
-    double maxy;
     double ox;
     double oy;
     double osint;
@@ -193,10 +187,10 @@ class rk4 {
       zap(xlim_next);
       zap(ylim_next);
       zap(bnodes_idx);
-      //std::cout<<"Class successfully terminated.\n";
+      std::cout<<"Class successfully terminated.\n";
     };
     void barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
-                         double &sumx, double &sumy, double &sumtheta, int &N_comp, double lgth);
+                         double &sumx, double &sumy, double &sumtheta, int &N_comp);
     void smart_compute_xx(double t_, double* x_, double* y_, double* theta_,
                           double* outputX, double* outputY, double* output_theta );
     inline void init_lims();

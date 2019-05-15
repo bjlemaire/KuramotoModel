@@ -3,7 +3,7 @@ include ./config.mk
 
 objs=rk4_solver.o
 src=$(patsubst %.o,%.cc,$(objs))
-execs=model4
+execs=model3
 
 all:
 	$(MAKE) executables
@@ -18,7 +18,7 @@ depend: $(src)
 %.o: %.cc
 	$(cxx) $(cflags) -c $<
 
-model4: Model4.cc rk4_solver.o
+model3: Model3.cc rk4_solver.o
 	$(cxx) $(cflags) -o $@ $< $(objs)
 
 
