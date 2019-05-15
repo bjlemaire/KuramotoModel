@@ -90,9 +90,9 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
       if (n4!=-1) barnes_compute(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
     }
     else{
-      sumx += nchd*(((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2));
-      sumy += nchd*(((my-yi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((my-yi)/norm2));
-      sumtheta += nchd*(msin*cos(thi)-sin(thi)*mcos)/norm;
+      sumx += ((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2);
+      sumy += ((my-yi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((my-yi)/norm2);
+      sumtheta += (msin*cos(thi)-sin(thi)*mcos)/norm;
       N_comp += nchd;
     }
   }
@@ -253,8 +253,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
     Gs_theta[i+4*N]=theta0[i];
   }
   // Then, we compute f(G1):
-  if (enable_BH) smart_compute_xx(t+C[0]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta);
-  else compute_xx(t+C[0]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta);
+  smart_compute_xx(t+C[0]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta);
 
   // Calculating G2:
 #pragma omp parallel for
@@ -265,8 +264,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G2):
-  if (enable_BH) smart_compute_xx(t+C[1]*h_step, (Gs_x+1*N), (Gs_y+1*N), (Gs_theta+1*N), (ff_x+1*N), (ff_y+1*N), (ff_theta+1*N));
-  else compute_xx(t+C[1]*h_step, (Gs_x+1*N), (Gs_y+1*N), (Gs_theta+1*N), (ff_x+1*N), (ff_y+1*N), (ff_theta+1*N));
+  smart_compute_xx(t+C[1]*h_step, (Gs_x+1*N), (Gs_y+1*N), (Gs_theta+1*N), (ff_x+1*N), (ff_y+1*N), (ff_theta+1*N));
 
   // Calculating G3:
   for (int i=0; i<N; i++){
@@ -279,8 +277,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G3):
-  if (enable_BH) smart_compute_xx(t+C[2]*h_step, (Gs_x+2*N), (Gs_y+2*N), (Gs_theta+2*N), (ff_x+2*N), (ff_y+2*N), (ff_theta+2*N));
-  else compute_xx(t+C[2]*h_step, (Gs_x+2*N), (Gs_y+2*N), (Gs_theta+2*N), (ff_x+2*N), (ff_y+2*N), (ff_theta+2*N));
+  smart_compute_xx(t+C[2]*h_step, (Gs_x+2*N), (Gs_y+2*N), (Gs_theta+2*N), (ff_x+2*N), (ff_y+2*N), (ff_theta+2*N));
 
 
   // Calculating G4:
@@ -298,8 +295,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G4):
-  if (enable_BH) smart_compute_xx(t+C[3]*h_step, (Gs_x+3*N), (Gs_y+3*N), (Gs_theta+3*N), (ff_x+3*N), (ff_y+3*N), (ff_theta+3*N));
-  else compute_xx(t+C[3]*h_step, (Gs_x+3*N), (Gs_y+3*N), (Gs_theta+3*N), (ff_x+3*N), (ff_y+3*N), (ff_theta+3*N));
+  smart_compute_xx(t+C[3]*h_step, (Gs_x+3*N), (Gs_y+3*N), (Gs_theta+3*N), (ff_x+3*N), (ff_y+3*N), (ff_theta+3*N));
 
 
   // Calculating G5:
@@ -320,8 +316,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   }
 
   // Computing f(G5):
-  if (enable_BH) smart_compute_xx(t+C[4]*h_step, (Gs_x+4*N), (Gs_y+4*N), (Gs_theta+4*N), (ff_x+4*N), (ff_y+4*N), (ff_theta+4*N));
-  else compute_xx(t+C[4]*h_step, (Gs_x+4*N), (Gs_y+4*N), (Gs_theta+4*N), (ff_x+4*N), (ff_y+4*N), (ff_theta+4*N));
+  smart_compute_xx(t+C[4]*h_step, (Gs_x+4*N), (Gs_y+4*N), (Gs_theta+4*N), (ff_x+4*N), (ff_y+4*N), (ff_theta+4*N));
 }
 
 void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
@@ -363,6 +358,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
       theta1h[i] += B[j+4]*h_step*ff_theta[i+j*N];
     }
   }
+  /*
   for (int i=0; i<N; i++){
     sc_x[i] = Atol + Rtol * std::max(std::abs(x0[i]), std::abs(x1[i]));
     sc_y[i] = Atol + Rtol * std::max(std::abs(y0[i]), std::abs(y1[i]));
@@ -390,6 +386,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   else if (t+last_h_step+h_step>T_final){
     h_step = T_final-(t+last_h_step);
   }
+  */
 }
 
 void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
@@ -401,15 +398,8 @@ void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
   double f1_x[N];
   double f1_y[N];
   double f1_theta[N];
-  
-  if (enable_BH){
-    smart_compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
-    smart_compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
-  }
-  else {
-    compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
-    compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
-  }
+  smart_compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
+  smart_compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
 
   for(int i=0; i<N; i++){
     double u_x = (1-myTheta)*x0[i] + myTheta*x1[i] + myTheta*(myTheta-1)*((1-2*myTheta)*(x1[i]-x0[i]) + (myTheta-1)*last_h_step*f0_x[i]+myTheta*last_h_step*f1_x[i]);
