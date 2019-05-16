@@ -1,0 +1,3299 @@
+%!PS-Adobe-3.0
+%%Title: rk4_solver.cc
+%%For: baptistelemaire
+%%Creator: VIM - Vi IMproved 8.1 (2018 May 18)
+%%CreationDate: Thu May 16 15:37:56 2019
+%%DocumentData: Clean8Bit
+%%Orientation: Portrait
+%%Pages: (atend)
+%%PageOrder: Ascend
+%%BoundingBox: 59 49 564 800
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%DocumentSuppliedResources: procset VIM-Prolog 1.4 1
+%%+ encoding VIM-latin1 1.0 0
+%%Requirements: duplex collate color
+%%EndComments
+%%BeginDefaults
+%%PageResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%PageMedia: A4
+%%EndDefaults
+%%BeginProlog
+%%BeginResource: procset VIM-Prolog
+%%BeginDocument: /usr/local/Cellar/macvim/8.1-155/MacVim.app/Contents/Resources/vim/runtime/print/prolog.ps
+%!PS-Adobe-3.0 Resource-ProcSet
+%%Title: VIM-Prolog
+%%Version: 1.4 1
+%%EndComments
+% Editing of this file is NOT RECOMMENDED.  You run a very good risk of causing
+% all PostScript printing from VIM failing if you do.  PostScript is not called
+% a write-only language for nothing!
+/packedarray where not{userdict begin/setpacking/pop load def/currentpacking
+false def end}{pop}ifelse/CP currentpacking def true setpacking
+/bd{bind def}bind def/ld{load def}bd/ed{exch def}bd/d/def ld
+/db{dict begin}bd/cde{currentdict end}bd
+/T true d/F false d
+/SO null d/sv{/SO save d}bd/re{SO restore}bd
+/L2 systemdict/languagelevel 2 copy known{get exec}{pop pop 1}ifelse 2 ge d
+/m/moveto ld/s/show ld /ms{m s}bd /g/setgray ld/r/setrgbcolor ld/sp{showpage}bd
+/gs/gsave ld/gr/grestore ld/cp/currentpoint ld
+/ul{gs UW setlinewidth cp UO add 2 copy newpath m 3 1 roll add exch lineto
+stroke gr}bd
+/bg{gs r cp BO add 4 -2 roll rectfill gr}bd
+/sl{90 rotate 0 exch translate}bd
+L2{
+/sspd{mark exch{setpagedevice}stopped cleartomark}bd
+/nc{1 db/NumCopies ed cde sspd}bd
+/sps{3 db/Orientation ed[3 1 roll]/PageSize ed/ImagingBBox null d cde sspd}bd
+/dt{2 db/Tumble ed/Duplex ed cde sspd}bd
+/c{1 db/Collate ed cde sspd}bd
+}{
+/nc{/#copies ed}bd
+/sps{statusdict/setpage get exec}bd
+/dt{statusdict/settumble 2 copy known{get exec}{pop pop pop}ifelse
+statusdict/setduplexmode 2 copy known{get exec}{pop pop pop}ifelse}bd
+/c{pop}bd
+}ifelse
+/ffs{findfont exch scalefont d}bd/sf{setfont}bd
+/ref{1 db findfont dup maxlength dict/NFD ed{exch dup/FID ne{exch NFD 3 1 roll
+put}{pop pop}ifelse}forall/Encoding findresource dup length 256 eq{NFD/Encoding
+3 -1 roll put}{pop}ifelse NFD dup/FontType get 3 ne{/CharStrings}{/CharProcs}
+ifelse 2 copy known{2 copy get dup maxlength dict copy[/questiondown/space]{2
+copy known{2 copy get 2 index/.notdef 3 -1 roll put pop exit}if pop}forall put
+}{pop pop}ifelse dup NFD/FontName 3 -1 roll put NFD definefont pop end}bd
+CP setpacking
+(\004)cvn{}bd
+% vim:ff=unix:
+%%EOF
+%%EndDocument
+%%EndResource
+%%BeginResource: encoding VIM-latin1
+%%BeginDocument: /usr/local/Cellar/macvim/8.1-155/MacVim.app/Contents/Resources/vim/runtime/print/latin1.ps
+%!PS-Adobe-3.0 Resource-Encoding
+%%Title: VIM-latin1
+%%Version: 1.0 0
+%%EndComments
+/VIM-latin1[
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quotesingle
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash
+/zero /one /two /three /four /five /six /seven
+/eight /nine /colon /semicolon /less /equal /greater /question
+/at /A /B /C /D /E /F /G
+/H /I /J /K /L /M /N /O
+/P /Q /R /S /T /U /V /W
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore
+/grave /a /b /c /d /e /f /g
+/h /i /j /k /l /m /n /o
+/p /q /r /s /t /u /v /w
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /periodcentered
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis]
+/Encoding defineresource pop
+% vim:ff=unix:
+%%EOF
+%%EndDocument
+%%EndResource
+%%EndProlog
+%%BeginSetup
+595 842 0 sps
+1 nc
+T F dt
+T c
+%%IncludeResource: font Courier
+/_F0 /VIM-latin1 /Courier ref
+/F0 10 /_F0 ffs
+%%IncludeResource: font Courier-Bold
+/_F1 /VIM-latin1 /Courier-Bold ref
+/F1 10 /_F1 ffs
+%%IncludeResource: font Courier-Oblique
+/_F2 /VIM-latin1 /Courier-Oblique ref
+/F2 10 /_F2 ffs
+%%IncludeResource: font Courier-BoldOblique
+/_F3 /VIM-latin1 /Courier-BoldOblique ref
+/F3 10 /_F3 ffs
+/UO -1 d
+/UW 0.5 d
+/BO -2.5 d
+%%EndSetup
+%%Page: 1 1
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 1)59.5 792.4 ms
+F0 sf
+0.498 0 0.498 r
+(#include )59.5 772.4 ms
+0.498 0.498 0 r
+("rk4_solver.hh")s
+0.498 0 0.498 r
+(#include )59.5 762.4 ms
+0.498 0.498 0 r
+(<iostream>)s
+0.498 0 0.498 r
+(#include )59.5 752.4 ms
+0.498 0.498 0 r
+(<iomanip>)s
+0.498 0 0.498 r
+(#include )59.5 742.4 ms
+0.498 0.498 0 r
+(<math.h>)s
+0.498 0 0.498 r
+(#include )59.5 732.4 ms
+0.498 0.498 0 r
+(<ctime>)s
+0.498 0 0.498 r
+(#include )59.5 722.4 ms
+0.498 0.498 0 r
+(<cstdlib>)s
+0.498 0 0.498 r
+(#include )59.5 712.4 ms
+0.498 0.498 0 r
+(<cstdio>)s
+0.498 0 0.498 r
+(#include )59.5 702.4 ms
+0.498 0.498 0 r
+(<fstream>)s
+0.498 0 0.498 r
+(#include )59.5 692.4 ms
+0.498 0.498 0 r
+(<string>)s
+0.498 0 0.498 r
+(#include )59.5 682.4 ms
+0.498 0.498 0 r
+(<omp.h>)s
+0.498 0 0.498 r
+(#include )59.5 672.4 ms
+0.498 0.498 0 r
+(<cfloat>)s
+0 0.498 0 r
+(void)59.5 652.4 ms
+0 g
+( rk4::find_square\()s
+0 0.498 0 r
+(double)s
+0 g
+( x, )s
+0 0.498 0 r
+(double)s
+0 g
+( y, )s
+0 0.498 0 r
+(bool)s
+0 g
+( nlim\){)s
+(  )59.5 642.4 ms
+0 0.498 0 r
+(bool)s
+0 g
+( y_geq = y>ylim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(  )59.5 632.4 ms
+0 0.498 0 r
+(bool)s
+0 g
+( x_leq = x<xlim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(  location = \( y_geq &&  x_leq\)*)59.5 622.4 ms
+0.498 0.498 0 r
+(7)s
+0 g
+(            +\( y_geq && !x_leq\)*)59.5 612.4 ms
+0.498 0.498 0 r
+(8)s
+0 g
+(            +\(!y_geq &&  x_leq\)*)59.5 602.4 ms
+0.498 0.498 0 r
+(9)s
+0 g
+(            +\(!y_geq && !x_leq\)*)59.5 592.4 ms
+0.498 0.498 0 r
+(10)s
+0 g
+(;)s
+(  xlim_next[)59.5 582.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(] = nlim*\( \(  x_leq *)s
+0.498 0.498 0 r
+(0.5)s
+0 g
+(*\(xlim[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]+xlim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]\)\))s
+(                       +\(\(!x_leq\)*)59.5 572.4 ms
+0.498 0.498 0 r
+(0.5)s
+0 g
+(*\(xlim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]+xlim[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]\)\)\))s
+(                + !nlim * xlim_next[)59.5 562.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(  xlim_next[)59.5 552.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(] = nlim*\(\(!x_leq\)?xlim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]:xlim_next[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]\) + !nlim * xlim_next[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(];)s
+(  xlim_next[)59.5 542.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(] = nlim*\( x_leq  ?xlim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]:xlim_next[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]\) + !nlim * xlim_next[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(];)s
+(  ylim_next[)59.5 532.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(] = nlim*\( \(  y_geq *)s
+0.498 0.498 0 r
+(0.5)s
+0 g
+(*\(ylim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]+ylim[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]\)\))s
+(                       +\(\(!y_geq\)*)59.5 522.4 ms
+0.498 0.498 0 r
+(0.5)s
+0 g
+(*\(ylim[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]+ylim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]\)\)\))s
+(                + !nlim * ylim_next[)59.5 512.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(  ylim_next[)59.5 502.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(] = nlim*\(  y_geq ?ylim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]:ylim_next[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]\) + !nlim * ylim_next[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(];)s
+(  ylim_next[)59.5 492.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(] = nlim*\(\(!y_geq\)?ylim[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]:ylim_next[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]\) + !nlim * ylim_next[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(];)s
+(})59.5 482.4 ms
+0 0.498 0 r
+(inline)59.5 462.4 ms
+0 g
+( )s
+0 0.498 0 r
+(void)s
+0 g
+( rk4::push_node\()s
+0 0.498 0 r
+(int)s
+0 g
+( i, )s
+0 0.498 0 r
+(double)s
+0 g
+( x_, )s
+0 0.498 0 r
+(double)s
+0 g
+( y_, )s
+0 0.498 0 r
+(double)s
+0 g
+( sint_, )s
+0 0.498 0 r
+(double)s
+0 g
+( cost_\){)s
+(  )59.5 452.4 ms
+0 0.498 0.498 r
+(// Every new pushed node is a value node.)s
+0 g
+(  barnes_list.push_back\()59.5 442.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(  )59.5 422.4 ms
+0 0.498 0.498 r
+(// Decided that every value node has only one "children": itself.)s
+0 g
+(  barnes_list.push_back\()59.5 412.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(  barnes_list.push_back\(x_\);)59.5 402.4 ms
+(  barnes_list.push_back\(y_\);)59.5 392.4 ms
+(  barnes_list.push_back\(sint_\);)59.5 382.4 ms
+(  barnes_list.push_back\(cost_\);)59.5 372.4 ms
+(  barnes_list.push_back\(i\);)59.5 362.4 ms
+(  barnes_list.push_back\(-)59.5 352.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(  barnes_list.push_back\(-)59.5 342.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(  barnes_list.push_back\(-)59.5 332.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(  barnes_list.push_back\(-)59.5 322.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(})59.5 312.4 ms
+0 0.498 0 r
+(inline)59.5 282.4 ms
+0 g
+( )s
+0 0.498 0 r
+(void)s
+0 g
+( rk4::init_lims\(\){)s
+(  )59.5 272.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( low_  = fmin\(minx-)s
+0.498 0.498 0 r
+(0.01)s
+0 g
+(*\(maxx-minx\), miny-)s
+0.498 0.498 0 r
+(0.01)s
+0 g
+(*\(maxy-miny\)\);)s
+(  )59.5 262.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( high_ = fmax\(maxx+)s
+0.498 0.498 0 r
+(0.01)s
+0 g
+(*\(maxx-minx\), maxy+)s
+0.498 0.498 0 r
+(0.01)s
+0 g
+(*\(maxy-miny\)\);)s
+(  xlim[)59.5 252.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(] = low_;)s
+(  xlim[)59.5 242.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(] = )s
+0.498 0.498 0 r
+(0.5)s
+0 g
+(*\(low_+high_\);)s
+(  xlim[)59.5 232.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(] = high_;)s
+(  ylim[)59.5 222.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(] = low_;)s
+(  ylim[)59.5 212.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(] = )s
+0.498 0.498 0 r
+(0.5)s
+0 g
+(*\(low_+high_\);)s
+(  ylim[)59.5 202.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(] = high_;)s
+(  )59.5 192.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(;i<)s
+0.498 0.498 0 r
+(3)s
+0 g
+(;i++\){)s
+(    xlim_next[i] = xlim[i];)59.5 182.4 ms
+(    ylim_next[i] = ylim[i];)59.5 172.4 ms
+(  })59.5 162.4 ms
+(})59.5 152.4 ms
+0 0.498 0 r
+(void)59.5 132.4 ms
+0 g
+( rk4::barnes_compute\()s
+0 0.498 0 r
+(int)s
+0 g
+( cidx_, )s
+0 0.498 0 r
+(int)s
+0 g
+( &i, )s
+0 0.498 0 r
+(double)s
+0 g
+( xi, )s
+0 0.498 0 r
+(double)s
+0 g
+( yi, )s
+0 0.498 0 r
+(double)s
+0 g
+( thi,)s
+(                         )59.5 122.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( &sumx, )s
+0 0.498 0 r
+(double)s
+0 g
+( &sumy, )s
+0 0.498 0 r
+(double)s
+0 g
+( &sumtheta, )s
+0 0.498 0 r
+(int)s
+0 g
+( &N_comp, )s
+(                         )59.5 112.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( lgth\){)s
+(  )59.5 102.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( mx=barnes_list[cidx_+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(], my=barnes_list[cidx_+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(],)s
+(         msin=barnes_list[cidx_+)59.5 92.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(], mcos=barnes_list[cidx_+)s
+0.498 0.498 0 r
+(5)s
+0 g
+(];)s
+(  )59.5 82.4 ms
+0 0.498 0 r
+(int)s
+0 g
+( val = \()s
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_], nchd=\()s
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(],)s
+(      pid = \()59.5 72.4 ms
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_+)s
+0.498 0.498 0 r
+(6)s
+0 g
+(], n1=\()s
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_+)s
+0.498 0.498 0 r
+(7)s
+0 g
+(],)s
+(      n2=\()59.5 62.4 ms
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_+)s
+0.498 0.498 0 r
+(8)s
+0 g
+(], n3=\()s
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_+)s
+0.498 0.498 0 r
+(9)s
+0 g
+(],)s
+(      n4=\()59.5 52.4 ms
+0 0.498 0 r
+(int)s
+0 g
+(\) barnes_list[cidx_+)s
+0.498 0.498 0 r
+(10)s
+0 g
+(];)s
+re sp
+%%PageTrailer
+%%Page: 2 2
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 2)59.5 792.4 ms
+F0 sf
+(  )59.5 772.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( norm2 = \(xi-mx\)*\(xi-mx\) + \(yi-my\)*\(yi-my\);)s
+(  )59.5 762.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( norm = sqrt\(norm2\);)s
+(  )59.5 742.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(val==)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\){)s
+(    )59.5 732.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(i != pid\){)s
+(      sumx += \(\(mx-xi\)/norm\)*\(AA+J*\(cos\(thi\)*mcos+sin\(thi\)*msin\)\) - BB *\(\(mx-xi\)/nor)59.5 722.4 ms
+(m2\);)59.5 712.4 ms
+(      sumy += \(\(my-yi\)/norm\)*\(AA+J*\(cos\(thi\)*mcos+sin\(thi\)*msin\)\) - BB *\(\(my-yi\)/nor)59.5 702.4 ms
+(m2\);)59.5 692.4 ms
+(      sumtheta += \(msin*cos\(thi\)-sin\(thi\)*mcos\)/norm;)59.5 682.4 ms
+(      N_comp += nchd;)59.5 672.4 ms
+(    })59.5 662.4 ms
+(  })59.5 652.4 ms
+(  )59.5 642.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+({)s
+(    )59.5 632.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(\(lgth/norm\)>barnes_theta\){)s
+(      )59.5 622.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(n1!=-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\) barnes_compute\(n1,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/)s
+0.498 0.498 0 r
+(2.)s
+0 g
+(\);)s
+(      )59.5 612.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(n2!=-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\) barnes_compute\(n2,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/)s
+0.498 0.498 0 r
+(2.)s
+0 g
+(\);)s
+(      )59.5 602.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(n3!=-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\) barnes_compute\(n3,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/)s
+0.498 0.498 0 r
+(2.)s
+0 g
+(\);)s
+(      )59.5 592.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(n4!=-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\) barnes_compute\(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/)s
+0.498 0.498 0 r
+(2.)s
+0 g
+(\);)s
+(    })59.5 582.4 ms
+(    )59.5 572.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+({)s
+(      sumx += nchd*\(\(\(mx-xi\)/norm\)*\(AA+J*\(cos\(thi\)*mcos+sin\(thi\)*msin\)\) - BB *\(\(mx-x)59.5 562.4 ms
+(i\)/norm2\)\);)59.5 552.4 ms
+(      sumy += nchd*\(\(\(my-yi\)/norm\)*\(AA+J*\(cos\(thi\)*mcos+sin\(thi\)*msin\)\) - BB *\(\(my-y)59.5 542.4 ms
+(i\)/norm2\)\);)59.5 532.4 ms
+(      sumtheta += nchd*\(msin*cos\(thi\)-sin\(thi\)*mcos\)/norm;)59.5 522.4 ms
+(      N_comp += nchd;)59.5 512.4 ms
+(    })59.5 502.4 ms
+(  })59.5 492.4 ms
+(})59.5 482.4 ms
+0 0.498 0 r
+(void)59.5 462.4 ms
+0 g
+( rk4::smart_compute_xx\()s
+0 0.498 0 r
+(double)s
+0 g
+( t_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* x_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* y_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* theta_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* outputX, )59.5 452.4 ms
+0 0.498 0 r
+(double)s
+0 g
+(* outputY, )s
+0 0.498 0 r
+(double)s
+0 g
+(* output_theta\){)s
+(  )59.5 432.4 ms
+0 0.498 0.498 r
+(// Create a fresh Barnes-Hut list)s
+0 g
+(  barnes_list.clear\(\);)59.5 422.4 ms
+(  push_node\()59.5 412.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(, x_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(],y_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(],sin\(theta_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]\),cos\(theta_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]\)\);)s
+(  barnes_list[)59.5 402.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(] = )s
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(  barnes_list[\(y_[)59.5 392.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(]>)s
+0.498 0.498 0 r
+(0)s
+0 g
+(\)?\(\(x_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]<)s
+0.498 0.498 0 r
+(0)s
+0 g
+(\)?)s
+0.498 0.498 0 r
+(7)s
+0 g
+(:)s
+0.498 0.498 0 r
+(8)s
+0 g
+(\):\(\(x_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]<)s
+0.498 0.498 0 r
+(0)s
+0 g
+(\)?)s
+0.498 0.498 0 r
+(9)s
+0 g
+(:)s
+0.498 0.498 0 r
+(10)s
+0 g
+(\)] = barnes_list.size\(\);)s
+(  cidx = barnes_list.size\(\);)59.5 382.4 ms
+(  push_node\()59.5 372.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(, x_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(],y_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(],sin\(theta_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]\),cos\(theta_[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]\)\);)s
+(  minx=)59.5 362.4 ms
+0.498 0.498 0 r
+(DBL_MAX)s
+0 g
+(;)s
+(  maxx=-)59.5 352.4 ms
+0.498 0.498 0 r
+(DBL_MAX)s
+0 g
+(;)s
+(  miny=)59.5 342.4 ms
+0.498 0.498 0 r
+(DBL_MAX)s
+0 g
+(;)s
+(  maxy=-)59.5 332.4 ms
+0.498 0.498 0 r
+(DBL_MAX)s
+0 g
+(;)s
+(  )59.5 322.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    minx = \(x_[i]<minx\)?x_[i]:minx;)59.5 312.4 ms
+(    maxx = \(x_[i]>maxx\)?x_[i]:maxx;)59.5 302.4 ms
+(    miny = \(y_[i]<miny\)?y_[i]:miny;)59.5 292.4 ms
+(    maxy = \(y_[i]>maxy\)?y_[i]:maxy;)59.5 282.4 ms
+(  })59.5 272.4 ms
+(  )59.5 262.4 ms
+0 0.498 0.498 r
+(// Initialize xlim, ylim, xlim_next, ylim_next)s
+0 g
+(  init_lims\(\);)59.5 252.4 ms
+(  )59.5 242.4 ms
+(  )59.5 232.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(1)s
+0 g
+(; i<N; i++\){)s
+(    not_found = )59.5 222.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(    cidx = )59.5 212.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(    location = )59.5 202.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(    init_lims\(\);)59.5 192.4 ms
+(    )59.5 182.4 ms
+0.498 0.498 0 r
+(do)s
+0 g
+({)s
+(      )59.5 172.4 ms
+0 0.498 0.498 r
+(// If the current node is a root :)s
+0 g
+(      )59.5 162.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(barnes_list[cidx] == )s
+0.498 0.498 0 r
+(0)s
+0 g
+(\){)s
+(        )59.5 142.4 ms
+0 0.498 0.498 r
+(// Find the child node corresponding to our particle i)s
+0 g
+(        find_square\(x_[i],y_[i],)59.5 132.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(        fidx = cidx+location;)59.5 122.4 ms
+(        )59.5 102.4 ms
+0 0.498 0.498 r
+(// If child node is empty node, create the new node.)s
+0 g
+(        )59.5 92.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(barnes_list[fidx]==-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\){)s
+(          barnes_list[fidx]=barnes_list.size\(\);)59.5 82.4 ms
+(          push_node\(i, x_[i],y_[i],sin\(theta_[i]\),cos\(theta_[i]\)\);)59.5 72.4 ms
+(          )59.5 52.4 ms
+0 0.498 0.498 r
+(// We increment the number of children of this node)s
+re sp
+%%PageTrailer
+%%Page: 3 3
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 3)59.5 792.4 ms
+F0 sf
+(          barnes_list[cidx+)59.5 772.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(] += )s
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(          N_child = barnes_list[cidx+)59.5 762.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(          barnes_list[cidx+)59.5 752.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(] + x_[i]\)/N_child;)s
+(          barnes_list[cidx+)59.5 742.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(] + y_[i]\)/N_child;)s
+(          barnes_list[cidx+)59.5 732.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(] + sin\(theta_[i]\)\)/N)s
+(_child;)59.5 722.4 ms
+(          barnes_list[cidx+)59.5 712.4 ms
+0.498 0.498 0 r
+(5)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(5)s
+0 g
+(] + cos\(theta_[i]\)\)/N)s
+(_child;)59.5 702.4 ms
+(          )59.5 682.4 ms
+0 0.498 0.498 r
+(// Declare having found final node of particle i)s
+0 g
+(          )59.5 672.4 ms
+0 0.498 0.498 r
+(// - can leave the do-while loop and go to next)s
+0 g
+(          )59.5 662.4 ms
+0 0.498 0.498 r
+(// particle i+1.)s
+0 g
+(          not_found = )59.5 652.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(        })59.5 642.4 ms
+(        )59.5 632.4 ms
+0 0.498 0.498 r
+(// If child node not empty, navigate to this next node.)s
+0 g
+(        )59.5 622.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( {)s
+(          barnes_list[cidx+)59.5 612.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(] += )s
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(          N_child = barnes_list[cidx+)59.5 602.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(          barnes_list[cidx+)59.5 592.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(] + x_[i]\)/N_child;)s
+(          barnes_list[cidx+)59.5 582.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(] + y_[i]\)/N_child;)s
+(          barnes_list[cidx+)59.5 572.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(] + sin\(theta_[i]\)\)/N)s
+(_child;)59.5 562.4 ms
+(          barnes_list[cidx+)59.5 552.4 ms
+0.498 0.498 0 r
+(5)s
+0 g
+(] = \(\(N_child-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*barnes_list[cidx+)s
+0.498 0.498 0 r
+(5)s
+0 g
+(] + cos\(theta_[i]\)\)/N)s
+(_child;)59.5 542.4 ms
+(          cidx = barnes_list[fidx];)59.5 532.4 ms
+(          xlim[)59.5 522.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(]=xlim_next[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(];)s
+(          xlim[)59.5 512.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(]=xlim_next[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(          xlim[)59.5 502.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(]=xlim_next[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(];)s
+(          ylim[)59.5 492.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(]=ylim_next[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(];)s
+(          ylim[)59.5 482.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(]=ylim_next[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(];)s
+(          ylim[)59.5 472.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(]=ylim_next[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(];)s
+(        })59.5 462.4 ms
+(      })59.5 452.4 ms
+(      )59.5 432.4 ms
+0 0.498 0.498 r
+(// If current node just a value : need to turn the node into a root.)s
+0 g
+(      )59.5 422.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+({)s
+(        )59.5 402.4 ms
+0 0.498 0.498 r
+(// Copy the values of value-node, and push them as new node)s
+0 g
+(        ox = barnes_list[cidx+)59.5 392.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(];)s
+(        oy = barnes_list[cidx+)59.5 382.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(];)s
+(        osint = barnes_list[cidx+)59.5 372.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(];)s
+(        ocost = barnes_list[cidx+)59.5 362.4 ms
+0.498 0.498 0 r
+(5)s
+0 g
+(];)s
+(        oid = barnes_list[cidx+)59.5 352.4 ms
+0.498 0.498 0 r
+(6)s
+0 g
+(];)s
+(        barnes_list[cidx] = )59.5 342.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(        find_square\(ox,oy,)59.5 332.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(\);)s
+(        barnes_list[cidx+location]=barnes_list.size\(\);)59.5 322.4 ms
+(        push_node\(oid, ox, oy, osint, ocost\);)59.5 312.4 ms
+(        )59.5 302.4 ms
+0 0.498 0.498 r
+(// Note: current index "cidx" remains identical.)s
+0 g
+(      })59.5 292.4 ms
+(    } )59.5 282.4 ms
+0.498 0.498 0 r
+(while)s
+0 g
+(\(not_found\);)s
+(  })59.5 272.4 ms
+0.498 0 0.498 r
+(#pragma omp parallel )59.5 252.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(  )59.5 242.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    cidx = )59.5 232.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(    outputX[i] = )59.5 222.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    outputY[i] = )59.5 212.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    output_theta[i] = )59.5 202.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 192.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sumx = )s
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 182.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sumy = )s
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 172.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sumtheta = )s
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 162.4 ms
+0 0.498 0 r
+(int)s
+0 g
+( N_comp = )s
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(    barnes_compute\()59.5 152.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(, i, x_[i], y_[i], theta_[i], sumx, sumy, sumtheta, N_comp, maxx)s
+(-minx\);)59.5 142.4 ms
+(    outputX[i] = \()59.5 132.4 ms
+0.498 0.498 0 r
+(1.)s
+0 g
+(/)s
+0 0.498 0 r
+(float)s
+0 g
+(\(N_comp\)\)*sumx;)s
+(    outputY[i] = \()59.5 122.4 ms
+0.498 0.498 0 r
+(1.)s
+0 g
+(/)s
+0 0.498 0 r
+(float)s
+0 g
+(\(N_comp\)\)*sumy;)s
+(    output_theta[i] = \()59.5 112.4 ms
+0 0.498 0 r
+(float)s
+0 g
+(\(K\)/)s
+0 0.498 0 r
+(float)s
+0 g
+(\(N_comp\)\)*sumtheta;)s
+(  })59.5 102.4 ms
+(  barnes_list.clear\(\);)59.5 82.4 ms
+(})59.5 72.4 ms
+0 0.498 0 r
+(void)59.5 52.4 ms
+0 g
+( rk4::compute_xx\()s
+0 0.498 0 r
+(double)s
+0 g
+( t_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* x_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* y_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* theta_, )s
+0 0.498 0 r
+(double)s
+0 g
+(* outp)s
+re sp
+%%PageTrailer
+%%Page: 4 4
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 4)59.5 792.4 ms
+F0 sf
+(utX, )59.5 772.4 ms
+0 0.498 0 r
+(double)s
+0 g
+(* outputY, )s
+0 0.498 0 r
+(double)s
+0 g
+(* output_theta\){)s
+0.498 0 0.498 r
+(#pragma omp parallel )59.5 752.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(  )59.5 742.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    outputX[i] = )59.5 732.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    outputY[i] = )59.5 722.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    output_theta[i] = )59.5 712.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 702.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sumx = )s
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 692.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sumy = )s
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 682.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sumtheta = )s
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    )59.5 672.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( j=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; j<N; j++\){)s
+(      )59.5 662.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(j!=i\){)s
+(        )59.5 652.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( norm2 = \(x_[j]-x_[i]\)*\(x_[j]-x_[i]\) + \(y_[j]-y_[i]\)*\(y_[j]-y_[i]\);)s
+(        )59.5 642.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( norm = sqrt\(norm2\);)s
+(        sumx += \(\(x_[j]-x_[i]\)/norm\)*\(AA+J*cos\(theta_[j]-theta_[i]\)\) - BB*\(\(x_[j]-x_)59.5 632.4 ms
+([i]\)/norm2\);)59.5 622.4 ms
+(        sumy += \(\(y_[j]-y_[i]\)/norm\)*\(AA+J*cos\(theta_[j]-theta_[i]\)\) - BB*\(\(y_[j]-y_)59.5 612.4 ms
+([i]\)/norm2\);)59.5 602.4 ms
+(        sumtheta += sin\(theta_[j]-theta_[i]\)/norm;)59.5 592.4 ms
+(      })59.5 582.4 ms
+(    })59.5 572.4 ms
+(    outputX[i] += \()59.5 562.4 ms
+0.498 0.498 0 r
+(1.)s
+0 g
+(/)s
+0 0.498 0 r
+(float)s
+0 g
+(\(N\)\)*sumx;)s
+(    outputY[i] += \()59.5 552.4 ms
+0.498 0.498 0 r
+(1.)s
+0 g
+(/)s
+0 0.498 0 r
+(float)s
+0 g
+(\(N\)\)*sumy;)s
+(    output_theta[i] += \()59.5 542.4 ms
+0 0.498 0 r
+(float)s
+0 g
+(\(K\)/)s
+0 0.498 0 r
+(float)s
+0 g
+(\(N\)\)*sumtheta;)s
+(  })59.5 532.4 ms
+(})59.5 522.4 ms
+0 0.498 0 r
+(void)59.5 492.4 ms
+0 g
+( rk4::compute_Gs\()s
+0 0.498 0 r
+(double)s
+0 g
+( t, )s
+0 0.498 0 r
+(double)s
+0 g
+(* Gs_x, )s
+0 0.498 0 r
+(double)s
+0 g
+(* ff_x, )s
+0 0.498 0 r
+(double)s
+0 g
+(* Gs_y, )s
+0 0.498 0 r
+(double)s
+0 g
+(* ff_)s
+(y, )59.5 482.4 ms
+0 0.498 0 r
+(double)s
+0 g
+(* Gs_theta, )s
+0 0.498 0 r
+(double)s
+0 g
+(* ff_theta\){)s
+(  )59.5 472.4 ms
+0 0.498 0.498 r
+(// First, we calculate G1:)s
+0.498 0 0.498 r
+(#pragma omp parallel )59.5 462.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(  )59.5 452.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<\(N\); i++\){)s
+(    Gs_x[i]=x0[i];)59.5 442.4 ms
+(    Gs_x[i+)59.5 432.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N]=x0[i];)s
+(    Gs_x[i+)59.5 422.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]=x0[i];)s
+(    Gs_x[i+)59.5 412.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]=x0[i];)s
+(    Gs_x[i+)59.5 402.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]=x0[i];)s
+(    Gs_y[i]=y0[i];)59.5 392.4 ms
+(    Gs_y[i+)59.5 382.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N]=y0[i];)s
+(    Gs_y[i+)59.5 372.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]=y0[i];)s
+(    Gs_y[i+)59.5 362.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]=y0[i];)s
+(    Gs_y[i+)59.5 352.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]=y0[i];)s
+(    Gs_theta[i]=theta0[i];)59.5 342.4 ms
+(    Gs_theta[i+)59.5 332.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N]=theta0[i];)s
+(    Gs_theta[i+)59.5 322.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]=theta0[i];)s
+(    Gs_theta[i+)59.5 312.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]=theta0[i];)s
+(    Gs_theta[i+)59.5 302.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]=theta0[i];)s
+(  })59.5 292.4 ms
+(  )59.5 282.4 ms
+0 0.498 0.498 r
+(// Then, we compute f\(G1\):)s
+0 g
+(  )59.5 272.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(enable_BH\) smart_compute_xx\(t+C[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]*h_step, x0, y0, theta0, ff_x, ff_y, ff_thet)s
+(a\);)59.5 262.4 ms
+(  )59.5 252.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( compute_xx\(t+C[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta\);)s
+(  )59.5 232.4 ms
+0 0.498 0.498 r
+(// Calculating G2:)s
+0.498 0 0.498 r
+(#pragma omp parallel )59.5 222.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(  )59.5 212.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    Gs_x[i+)59.5 202.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]*h_step*ff_x[i];)s
+(    Gs_y[i+)59.5 192.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]*h_step*ff_y[i];)s
+(    Gs_theta[i+)59.5 182.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(0)s
+0 g
+(]*h_step*ff_theta[i];)s
+(  })59.5 172.4 ms
+(  )59.5 152.4 ms
+0 0.498 0.498 r
+(// Computing f\(G2\):)s
+0 g
+(  )59.5 142.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(enable_BH\) smart_compute_xx\(t+C[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(ff_x+)59.5 132.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(ff_y+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\)\);)s
+(  )59.5 122.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( compute_xx\(t+C[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(ff_x+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\),)s
+( \(ff_y+)59.5 112.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N\)\);)s
+(  )59.5 92.4 ms
+0 0.498 0.498 r
+(// Calculating G3:)s
+0 g
+(  )59.5 82.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    Gs_x[i+)59.5 72.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]*h_step*ff_x[i];)s
+(    Gs_x[i+)59.5 62.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]*h_step*ff_x[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_y[i+)59.5 52.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]*h_step*ff_y[i];)s
+re sp
+%%PageTrailer
+%%Page: 5 5
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 5)59.5 792.4 ms
+F0 sf
+(    Gs_y[i+)59.5 772.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]*h_step*ff_y[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_theta[i+)59.5 762.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(1)s
+0 g
+(]*h_step*ff_theta[i];)s
+(    Gs_theta[i+)59.5 752.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]*h_step*ff_theta[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(  })59.5 742.4 ms
+(  )59.5 722.4 ms
+0 0.498 0.498 r
+(// Computing f\(G3\):)s
+0 g
+(  )59.5 712.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(enable_BH\) smart_compute_xx\(t+C[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(ff_x+)59.5 702.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(ff_y+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\)\);)s
+(  )59.5 692.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( compute_xx\(t+C[)s
+0.498 0.498 0 r
+(2)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(ff_x+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\),)s
+( \(ff_y+)59.5 682.4 ms
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N\)\);)s
+(  )59.5 652.4 ms
+0 0.498 0.498 r
+(// Calculating G4:)s
+0.498 0 0.498 r
+(#pragma omp parallel )59.5 642.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(  )59.5 632.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    Gs_x[i+)59.5 622.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(3)s
+0 g
+(]*h_step*ff_x[i];)s
+(    Gs_x[i+)59.5 612.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(4)s
+0 g
+(]*h_step*ff_x[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_x[i+)59.5 602.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(]*h_step*ff_x[i+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N];)s
+(    Gs_y[i+)59.5 592.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(3)s
+0 g
+(]*h_step*ff_y[i];)s
+(    Gs_y[i+)59.5 582.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(4)s
+0 g
+(]*h_step*ff_y[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_y[i+)59.5 572.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(]*h_step*ff_y[i+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N];)s
+(    Gs_theta[i+)59.5 562.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(3)s
+0 g
+(]*h_step*ff_theta[i];)s
+(    Gs_theta[i+)59.5 552.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(4)s
+0 g
+(]*h_step*ff_theta[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_theta[i+)59.5 542.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(]*h_step*ff_theta[i+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N];)s
+(  })59.5 532.4 ms
+(  )59.5 512.4 ms
+0 0.498 0.498 r
+(// Computing f\(G4\):)s
+0 g
+(  )59.5 502.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(enable_BH\) smart_compute_xx\(t+C[)s
+0.498 0.498 0 r
+(3)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(ff_x+)59.5 492.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(ff_y+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\)\);)s
+(  )59.5 482.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( compute_xx\(t+C[)s
+0.498 0.498 0 r
+(3)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(ff_x+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\),)s
+( \(ff_y+)59.5 472.4 ms
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N\)\);)s
+(  )59.5 442.4 ms
+0 0.498 0.498 r
+(// Calculating G5:)s
+0.498 0 0.498 r
+(#pragma omp parallel )59.5 432.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(  )59.5 422.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    Gs_x[i+)59.5 412.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(6)s
+0 g
+(]*h_step*ff_x[i];)s
+(    Gs_x[i+)59.5 402.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(7)s
+0 g
+(]*h_step*ff_x[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_x[i+)59.5 392.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(8)s
+0 g
+(]*h_step*ff_x[i+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N];)s
+(    Gs_x[i+)59.5 382.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(9)s
+0 g
+(]*h_step*ff_x[i+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N];)s
+(    Gs_y[i+)59.5 372.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(6)s
+0 g
+(]*h_step*ff_y[i];)s
+(    Gs_y[i+)59.5 362.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(7)s
+0 g
+(]*h_step*ff_y[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_y[i+)59.5 352.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(8)s
+0 g
+(]*h_step*ff_y[i+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N];)s
+(    Gs_y[i+)59.5 342.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N]     += A[)s
+0.498 0.498 0 r
+(9)s
+0 g
+(]*h_step*ff_y[i+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N];)s
+(    Gs_theta[i+)59.5 332.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(6)s
+0 g
+(]*h_step*ff_theta[i];)s
+(    Gs_theta[i+)59.5 322.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(7)s
+0 g
+(]*h_step*ff_theta[i+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(*N];)s
+(    Gs_theta[i+)59.5 312.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(8)s
+0 g
+(]*h_step*ff_theta[i+)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*N];)s
+(    Gs_theta[i+)59.5 302.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N] += A[)s
+0.498 0.498 0 r
+(9)s
+0 g
+(]*h_step*ff_theta[i+)s
+0.498 0.498 0 r
+(3)s
+0 g
+(*N];)s
+(  })59.5 292.4 ms
+(  )59.5 272.4 ms
+0 0.498 0.498 r
+(// Computing f\(G5\):)s
+0 g
+(  )59.5 262.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(enable_BH\) smart_compute_xx\(t+C[)s
+0.498 0.498 0 r
+(4)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(ff_x+)59.5 252.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(ff_y+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\)\);)s
+(  )59.5 242.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( compute_xx\(t+C[)s
+0.498 0.498 0 r
+(4)s
+0 g
+(]*h_step, \(Gs_x+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(Gs_y+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(Gs_theta+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(ff_x+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\),)s
+( \(ff_y+)59.5 232.4 ms
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\), \(ff_theta+)s
+0.498 0.498 0 r
+(4)s
+0 g
+(*N\)\);)s
+(})59.5 222.4 ms
+0 0.498 0 r
+(void)59.5 202.4 ms
+0 g
+( rk4::compute_y1y1h\()s
+0 0.498 0 r
+(double)s
+0 g
+( t, )s
+0 0.498 0 r
+(double)s
+0 g
+(* Gs_x, )s
+0 0.498 0 r
+(double)s
+0 g
+(* ff_x, )s
+0 0.498 0 r
+(double)s
+0 g
+(* Gs_y, )s
+0 0.498 0 r
+(double)s
+0 g
+(* )s
+(ff_y, )59.5 192.4 ms
+0 0.498 0 r
+(double)s
+0 g
+(* Gs_theta, )s
+0 0.498 0 r
+(double)s
+0 g
+(* ff_theta\){)s
+(  )59.5 182.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sc_x[N];)s
+(  )59.5 172.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sc_y[N];)s
+(  )59.5 162.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( sc_theta[N];)s
+(  )59.5 152.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    sc_x[i] = )59.5 142.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    sc_y[i] = )59.5 132.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    sc_theta[i] = )59.5 122.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    x1[i] = )59.5 112.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    y1[i] = )59.5 102.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    theta1[i] = )59.5 92.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    x1h[i] = )59.5 82.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    y1h[i] = )59.5 72.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(    theta1[i] = )59.5 62.4 ms
+0.498 0.498 0 r
+(0.)s
+0 g
+(;)s
+(  })59.5 52.4 ms
+re sp
+%%PageTrailer
+%%Page: 6 6
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 6)59.5 792.4 ms
+F0 sf
+(  )59.5 762.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    x1[i]      = x0[i];)59.5 752.4 ms
+(    y1[i]      = y0[i];)59.5 742.4 ms
+(    theta1[i]  = theta0[i];)59.5 732.4 ms
+(    x1h[i]     = x0[i];)59.5 722.4 ms
+(    y1h[i]     = y0[i];)59.5 712.4 ms
+(    theta1h[i] = theta0[i];)59.5 702.4 ms
+(  })59.5 692.4 ms
+(  )59.5 682.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    )59.5 672.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( j=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; j<)s
+0.498 0.498 0 r
+(4)s
+0 g
+(; j++\){)s
+(      x1[i] += B[j]*h_step*ff_x[i+j*N];)59.5 662.4 ms
+(      y1[i] += B[j]*h_step*ff_y[i+j*N];)59.5 652.4 ms
+(      theta1[i] += B[j]*h_step*ff_theta[i+j*N];)59.5 642.4 ms
+(    })59.5 632.4 ms
+(  })59.5 622.4 ms
+(  )59.5 612.4 ms
+0 0.498 0.498 r
+(// We comment the adaptive timestep part)s
+(/*)59.5 602.4 ms
+(  for \(int i=0; i<N; i++\){)59.5 592.4 ms
+(    for \(int j=0; j<5; j++\){)59.5 582.4 ms
+(      x1h[i] += B[j+4]*h_step*ff_x[i+j*N];)59.5 572.4 ms
+(      y1h[i] += B[j+4]*h_step*ff_y[i+j*N];)59.5 562.4 ms
+(      theta1h[i] += B[j+4]*h_step*ff_theta[i+j*N];)59.5 552.4 ms
+(    })59.5 542.4 ms
+(  })59.5 532.4 ms
+(  for \(int i=0; i<N; i++\){)59.5 522.4 ms
+(    sc_x[i] = Atol + Rtol * std::max\(std::abs\(x0[i]\), std::abs\(x1[i]\)\);)59.5 512.4 ms
+(    sc_y[i] = Atol + Rtol * std::max\(std::abs\(y0[i]\), std::abs\(y1[i]\)\);)59.5 502.4 ms
+(    sc_theta[i] = Atol + Rtol * std::max\(std::abs\(theta0[i]\), std::abs\(theta1[i]\)\);)59.5 492.4 ms
+(  })59.5 482.4 ms
+(  double err=0.0;)59.5 462.4 ms
+(  for \(int i=0; i<N; i++\){)59.5 442.4 ms
+(    err += \(\(x1[i]-x1h[i]\)/sc_x[i]\)*\(\(x1[i]-x1h[i]\)/sc_x[i]\);)59.5 432.4 ms
+(    err += \(\(y1[i]-y1h[i]\)/sc_y[i]\)*\(\(y1[i]-y1h[i]\)/sc_y[i]\);)59.5 422.4 ms
+(    err += \(\(theta1[i]-theta1h[i]\)/sc_theta[i]\)*\(\(theta1[i]-theta1h[i]\)/sc_theta[i]\))59.5 412.4 ms
+(;)59.5 402.4 ms
+(  })59.5 392.4 ms
+(  err *= \(1./float\(N\)\);)59.5 372.4 ms
+(  err = sqrt\(err\);)59.5 362.4 ms
+(  last_h_step = h_step;)59.5 352.4 ms
+(  h_step = h_step * std::min\(facmax, std::max\(facmin, fac*pow\(\(1./err\), \(1./4.\)\)\)\);)59.5 342.4 ms
+(  )59.5 332.4 ms
+(  if \(err>1\){)59.5 312.4 ms
+(    compute_Gs\(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta\);)59.5 302.4 ms
+(    compute_y1y1h\(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta\);)59.5 292.4 ms
+(  })59.5 282.4 ms
+(  else if \(t+last_h_step+h_step>T_final\){)59.5 272.4 ms
+(    h_step = T_final-\(t+last_h_step\);)59.5 262.4 ms
+(  })59.5 252.4 ms
+(  */)59.5 242.4 ms
+0 g
+(})59.5 232.4 ms
+0 0.498 0 r
+(void)59.5 212.4 ms
+0 g
+( rk4::hermite\()s
+0 0.498 0 r
+(double)s
+0 g
+( actual_t, )s
+0 0.498 0 r
+(double)s
+0 g
+( myTheta, )s
+0 0.498 0 r
+(char)s
+0 g
+(* filenameDense\){)s
+(  std::ofstream myDense;)59.5 202.4 ms
+(  myDense.open\(filenameDense\);)59.5 192.4 ms
+(  )59.5 182.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( f0_x[N];)s
+(  )59.5 172.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( f0_y[N];)s
+(  )59.5 162.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( f0_theta[N];)s
+(  )59.5 152.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( f1_x[N];)s
+(  )59.5 142.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( f1_y[N];)s
+(  )59.5 132.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( f1_theta[N];)s
+(  )59.5 122.4 ms
+(  )59.5 112.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \(enable_BH\){)s
+(    smart_compute_xx\(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta\);)59.5 102.4 ms
+(    smart_compute_xx\(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta\);)59.5 92.4 ms
+(  })59.5 82.4 ms
+(  )59.5 72.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+( {)s
+(    compute_xx\(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta\);)59.5 62.4 ms
+(    compute_xx\(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta\);)59.5 52.4 ms
+re sp
+%%PageTrailer
+%%Page: 7 7
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 7)59.5 792.4 ms
+F0 sf
+(  })59.5 772.4 ms
+(  )59.5 752.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    )59.5 742.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( u_x = \()s
+0.498 0.498 0 r
+(1)s
+0 g
+(-myTheta\)*x0[i] + myTheta*x1[i] + myTheta*\(myTheta-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*\(\()s
+0.498 0.498 0 r
+(1)s
+0 g
+(-)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*myThe)s
+(ta\)*\(x1[i]-x0[i]\) + \(myTheta-)59.5 732.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*last_h_step*f0_x[i]+myTheta*last_h_step*f1_x[i]\);)s
+(    )59.5 722.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( u_y = \()s
+0.498 0.498 0 r
+(1)s
+0 g
+(-myTheta\)*y0[i] + myTheta*y1[i] + myTheta*\(myTheta-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*\(\()s
+0.498 0.498 0 r
+(1)s
+0 g
+(-)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*myThe)s
+(ta\)*\(y1[i]-y0[i]\) + \(myTheta-)59.5 712.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*last_h_step*f0_y[i]+myTheta*last_h_step*f1_y[i]\);)s
+(    )59.5 702.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( u_theta = \()s
+0.498 0.498 0 r
+(1)s
+0 g
+(-myTheta\)*theta0[i] + myTheta*theta1[i] + myTheta*\(myTheta-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\))s
+(*\(\()59.5 692.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(-)s
+0.498 0.498 0 r
+(2)s
+0 g
+(*myTheta\)*\(theta1[i]-theta0[i]\) + \(myTheta-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\)*last_h_step*f0_theta[i]+myTheta*)s
+(last_h_step*f1_theta[i]\);)59.5 682.4 ms
+(    myDense<<\(actual_t + myTheta*last_h_step\)<<)59.5 672.4 ms
+0.498 0.498 0 r
+(" ")s
+0 g
+(<<u_x <<)s
+0.498 0.498 0 r
+(" ")s
+0 g
+(<< u_y<<)s
+0.498 0.498 0 r
+(" ")s
+0 g
+(<<u_theta<<s)s
+(td::endl;)59.5 662.4 ms
+(  })59.5 652.4 ms
+(  myDense.close\(\);)59.5 642.4 ms
+(})59.5 632.4 ms
+0 0.498 0 r
+(void)59.5 612.4 ms
+0 g
+( rk4::dense_output\()s
+0 0.498 0 r
+(double)s
+0 g
+( t_\){)s
+(  )59.5 602.4 ms
+0 0.498 0 r
+(int)s
+0 g
+( m1=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(  )59.5 592.4 ms
+0.498 0.498 0 r
+(if)s
+0 g
+( \()s
+0 0.498 0 r
+(float)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+(\(t_/dense_stpsze\)\) == t_/dense_stpsze\){)s
+(    m1 = )59.5 582.4 ms
+0 0.498 0 r
+(int)s
+0 g
+(\(t_/dense_stpsze\)-)s
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(  })59.5 572.4 ms
+(  )59.5 562.4 ms
+0.498 0.498 0 r
+(else)s
+0 g
+({)s
+(    m1 = )59.5 552.4 ms
+0 0.498 0 r
+(int)s
+0 g
+(\(t_/dense_stpsze\);)s
+(  })59.5 542.4 ms
+(  )59.5 532.4 ms
+0 0.498 0 r
+(int)s
+0 g
+( m2 = )s
+0 0.498 0 r
+(int)s
+0 g
+(\(\(t_+last_h_step\)/dense_stpsze\);)s
+(  )59.5 522.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+( \()s
+0 0.498 0 r
+(int)s
+0 g
+( k=\(m1+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\); k<\(m2+)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\); k++\){)s
+(    )59.5 512.4 ms
+0 0.498 0 r
+(char)s
+0 g
+( filenameDense[)s
+0.498 0.498 0 r
+(32)s
+0 g
+(];)s
+(    sprintf\(filenameDense, )59.5 502.4 ms
+0.498 0.498 0 r
+("Dense)s
+0.498 0 0.498 r
+(%04d)s
+0.498 0.498 0 r
+(.txt")s
+0 g
+(, k\);)s
+(    hermite\(t_, \(dense_stpsze*k-t_\)/last_h_step, filenameDense\);)59.5 492.4 ms
+(  })59.5 482.4 ms
+(})59.5 472.4 ms
+0 0.498 0 r
+(void)59.5 452.4 ms
+0 g
+( rk4::nextStep\(\){)s
+(  )59.5 442.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    x0[i]=x1[i];)59.5 432.4 ms
+(    y0[i]=y1[i];)59.5 422.4 ms
+(    theta0[i]=theta1[i];)59.5 412.4 ms
+(  })59.5 402.4 ms
+(})59.5 392.4 ms
+0 0.498 0 r
+(void)59.5 372.4 ms
+0 g
+( rk4::compute_solution\()s
+0 0.498 0 r
+(double)s
+0 g
+( T_final_\){)s
+(  T_final = T_final_;)59.5 362.4 ms
+(  dense_stpsze = )59.5 352.4 ms
+0 0.498 0 r
+(double)s
+0 g
+(\(T_final/)s
+0 0.498 0 r
+(double)s
+0 g
+(\(n_intvls\)\);)s
+(  )59.5 342.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( t=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(  )59.5 332.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( Gs_x[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(*N];)s
+(  )59.5 322.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( ff_x[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(*N];)s
+(  )59.5 312.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( Gs_y[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(*N];)s
+(  )59.5 302.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( ff_y[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(*N];)s
+(  )59.5 292.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( Gs_theta[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(*N];)s
+(  )59.5 282.4 ms
+0 0.498 0 r
+(double)s
+0 g
+( ff_theta[)s
+0.498 0.498 0 r
+(5)s
+0 g
+(*N];)s
+(  initialize\(\);)59.5 272.4 ms
+(  )59.5 262.4 ms
+0.498 0.498 0 r
+(while)s
+0 g
+(\(t<T_final\){)s
+(    compute_Gs\(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta\);)59.5 252.4 ms
+(    compute_y1y1h\(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta\);)59.5 242.4 ms
+(    dense_output\(t\);)59.5 232.4 ms
+(    t += last_h_step;)59.5 222.4 ms
+(    )59.5 212.4 ms
+0 0.498 0.498 r
+(//printf\("t=%f, next_step=%f\\n", t, h_step\);)s
+0 g
+(    step_counter += )59.5 202.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(    nextStep\(\);)59.5 192.4 ms
+(  };)59.5 182.4 ms
+(  )59.5 172.4 ms
+0 0.498 0.498 r
+(//printf\("Done! It tool us %d steps to perform the entire integration.", step_coun)s
+(ter\);)59.5 162.4 ms
+0 g
+(})59.5 152.4 ms
+0 0.498 0 r
+(void)59.5 132.4 ms
+0 g
+( rk4::initialize\(\){)s
+(  srand \()59.5 122.4 ms
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(unsigned)s
+0 g
+(> \(time\()s
+0.498 0.498 0 r
+(0)s
+0 g
+(\)\)\);)s
+(  )59.5 112.4 ms
+0 0.498 0 r
+(float)s
+0 g
+( max_xy = )s
+0.498 0.498 0 r
+(2)s
+0 g
+(;)s
+(  )59.5 102.4 ms
+0 0.498 0 r
+(float)s
+0 g
+( max_angle = )s
+0.498 0.498 0 r
+(2)s
+0 g
+(*)s
+0.498 0.498 0 r
+(M_PI)s
+0 g
+(;)s
+(  )59.5 92.4 ms
+0 0.498 0.498 r
+(//printf\("N=%d\\n", N\);)s
+0 g
+(  )59.5 82.4 ms
+0.498 0.498 0 r
+(for)s
+0 g
+(\()s
+0 0.498 0 r
+(int)s
+0 g
+( i=)s
+0.498 0.498 0 r
+(0)s
+0 g
+(; i<N; i++\){)s
+(    )59.5 72.4 ms
+0 0.498 0 r
+(float)s
+0 g
+( x;)s
+(    )59.5 62.4 ms
+0 0.498 0 r
+(float)s
+0 g
+( y;)s
+(    )59.5 52.4 ms
+0 0.498 0 r
+(float)s
+0 g
+( phse;)s
+re sp
+%%PageTrailer
+%%Page: 8 8
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(rk4_solver.cc                                                                 Page 8)59.5 792.4 ms
+F0 sf
+(    )59.5 772.4 ms
+0.498 0.498 0 r
+(do)s
+0 g
+( {)s
+(      x = )59.5 762.4 ms
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(float)s
+0 g
+(> \(rand\(\)\) / \()s
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(float)s
+0 g
+(> \()s
+0.498 0.498 0 r
+(RAND_MAX)s
+0 g
+(/max_xy\)\);)s
+(      y = )59.5 752.4 ms
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(float)s
+0 g
+(> \(rand\(\)\) / \()s
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(float)s
+0 g
+(> \()s
+0.498 0.498 0 r
+(RAND_MAX)s
+0 g
+(/max_xy\)\);)s
+(      phse = )59.5 742.4 ms
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(float)s
+0 g
+(> \(rand\(\)\) / \()s
+0.498 0.498 0 r
+(static_cast )s
+0 g
+(<)s
+0 0.498 0 r
+(float)s
+0 g
+(> \()s
+0.498 0.498 0 r
+(RAND_MAX)s
+0 g
+(/max_angle)s
+(\)\);)59.5 732.4 ms
+(      x-=)59.5 722.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(      y-=)59.5 712.4 ms
+0.498 0.498 0 r
+(1)s
+0 g
+(;)s
+(    } )59.5 702.4 ms
+0.498 0.498 0 r
+(while)s
+0 g
+( \(\(x*x + y*y\)>)s
+0.498 0.498 0 r
+(1)s
+0 g
+(\);)s
+(    x0[i] = x;)59.5 692.4 ms
+(    y0[i] = y;)59.5 682.4 ms
+(    theta0[i] = phse;)59.5 672.4 ms
+(    vx0[i] = )59.5 662.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(    vy0[i] = )59.5 652.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(    omega0[i] = )59.5 642.4 ms
+0.498 0.498 0 r
+(0)s
+0 g
+(;)s
+(  })59.5 632.4 ms
+(})59.5 622.4 ms
+re sp
+%%PageTrailer
+%%Trailer
+%%Pages: 8
+%%EOF
+

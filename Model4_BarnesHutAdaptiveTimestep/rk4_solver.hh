@@ -21,47 +21,17 @@ class rk4 {
     std::vector<double> bnodes;
 
     rk4(int N_, double hi_step, double tol, double J_, double K_, int n_intvls_, double barnes_theta_, bool enable_BH_){
-      N = N_;
-      enable_BH = enable_BH_;
-      AA = 1.;
-      BB = 1.;
-      J  = J_;
-      K  = K_;
-      step_counter = 0;
-      n_intvls = n_intvls_;
-      not_found = 1;
-      barnes_theta = barnes_theta_;
-      SIZE_LIST = 11;
-      x0 = new double[N];
-      y0 = new double[N];
-      theta0 = new double[N];
-      vx0 = new double [N];
-      vy0 = new double [N];
-      omega0 = new double [N];
-      x1 = new double[N];
-      y1 = new double[N];
-      theta1 = new double[N];
-      x1h = new double[N];
-      y1h = new double[N];
-      theta1h = new double[N];
-      sc_x = new double[N];
-      sc_y = new double[N];
-      sc_theta = new double[N];
-      xlim = new double[3];
-      ylim = new double[3];
-      xlim_next = new double[3];
-      ylim_next = new double[3];
-      bnodes_idx = new double[N];
-      Rtol = tol;
-      Atol = tol;
-      fac = 0.9;
-      facmax = 3.;
-      facmin = 1./3.;
-      h_step = hi_step;
-      last_h_step = hi_step;
-      A = new double[10];
-      B = new double[9];
-      C = new double[5];
+      N = N_; enable_BH = enable_BH_; AA = 1.; BB = 1.; J  = J_; K  = K_;
+      step_counter = 0; n_intvls = n_intvls_; not_found = 1; barnes_theta = barnes_theta_;
+      SIZE_LIST = 11; x0 = new double[N]; y0 = new double[N]; theta0 = new double[N];
+      vx0 = new double [N]; vy0 = new double [N]; omega0 = new double [N];
+      x1 = new double[N]; y1 = new double[N]; theta1 = new double[N];
+      x1h = new double[N]; y1h = new double[N]; theta1h = new double[N];
+      sc_x = new double[N]; sc_y = new double[N]; sc_theta = new double[N];
+      xlim = new double[3]; ylim = new double[3]; xlim_next = new double[3]; ylim_next = new double[3];
+      bnodes_idx = new double[N]; Rtol = tol; Atol = tol; fac = 0.9; facmax = 3.; facmin = 1./3.;
+      h_step = hi_step; last_h_step = hi_step; A = new double[10]; B = new double[9]; C = new double[5];
+      // Constructing the Butcher tables
       for(int i=0; i<10; i++){
         switch(i){
           case 0: A[i]=1./3.;
@@ -101,7 +71,6 @@ class rk4 {
           default: break;
         }
       }
-    
     };
     void initialize();
     void compute_solution(double T_final_);
@@ -118,30 +87,10 @@ class rk4 {
       myArray = NULL;
     };
     void terminate(){
-      zap(x0);
-      zap(y0);
-      zap(theta0);
-      zap(x1);
-      zap(y1);
-      zap(theta1);
-      zap(x1h);
-      zap(y1h);
-      zap(theta1h);
-      zap(vx0);
-      zap(vy0);
-      zap(omega0);
-      zap(sc_x);
-      zap(sc_y);
-      zap(sc_theta);
-      zap(A);
-      zap(B);
-      zap(C);
-      zap(xlim);
-      zap(ylim);
-      zap(xlim_next);
-      zap(ylim_next);
-      zap(bnodes_idx);
-      //std::cout<<"Class successfully terminated.\n";
+      zap(x0); zap(y0); zap(theta0); zap(x1); zap(y1); zap(theta1);
+      zap(x1h); zap(y1h); zap(theta1h); zap(vx0); zap(vy0); zap(omega0);
+      zap(sc_x); zap(sc_y); zap(sc_theta); zap(A); zap(B); zap(C);
+      zap(xlim); zap(ylim); zap(xlim_next); zap(ylim_next);zap(bnodes_idx);
     };
     void barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
                          double &sumx, double &sumy, double &sumtheta, int &N_comp, double lgth);
