@@ -39,7 +39,7 @@ for count, file in enumerate(dense_files):
     for line in data:
         t, x, y, θ = [float(itm) for itm in line.split()]
         ø = (myTan(y,x))
-        plt.plot(x,y, 'o', color = rgb(θ))
+        plt.plot(x,y, '.', color = rgb(θ))
         listx.append(x)
         listy.append(y)
         listth.append(np.fmod(θ, 2*np.pi))

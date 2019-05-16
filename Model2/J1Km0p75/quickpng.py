@@ -25,7 +25,7 @@ listWm = []
 
 myTan = lambda y,x: np.arctan2(y,x) if np.arctan2(y,x)>0 else 2*np.pi+np.arctan2(y,x)
 
-for count, file in enumerate(dense_files):
+for count, file in enumerate(dense_files[-1:]):
     fig, ax = plt.subplots(1, figsize = (5,5))
     listx = []
     listy = []
@@ -39,7 +39,7 @@ for count, file in enumerate(dense_files):
     for line in data:
         t, x, y, θ = [float(itm) for itm in line.split()]
         ø = (myTan(y,x))
-        plt.plot(x,y, 'o', color = rgb(θ))
+        plt.plot(x,y, '.', color = rgb(θ))
         listx.append(x)
         listy.append(y)
         listth.append(np.fmod(θ, 2*np.pi))
@@ -57,7 +57,7 @@ for count, file in enumerate(dense_files):
     plt.xlim([lim_min, lim_max])
     plt.ylim([lim_min, lim_max])
     plt.title('t={:05.3f}'.format(t), fontweight = 'bold', fontsize = 14)
-    plt.savefig(file[:-4]+'.png')
+    plt.savefig(file[:-4]+'_hd.png', dpi=300)
     plt.close('all')
     fig, ax = plt.subplots(1, figsize = (5.5,4.5))
     plt.plot(listphi,listth, '.', color = '#6603a0', alpha =0.8)
@@ -75,7 +75,7 @@ for count, file in enumerate(dense_files):
     ax.yaxis.set_label_coords(-0.01,1.02)
     plt.title('t={:05.3f}'.format(t), fontweight = 'bold', fontsize = 14)
     #plt.tight_layout()
-    plt.savefig(file[:-4]+'_phase.png')
+    plt.savefig(file[:-4]+'_phase_hd.png',dpi=300)
     plt.close('all')
     listWp.append(Wp)
     listWm.append(Wm)
@@ -85,6 +85,6 @@ plt.plot(listT,listWp,'.', color = '#09a02c', label = r'$W_p$')
 plt.plot(listT,listWm,'.', color = '#a01f09', label = r'$W_m$')
 plt.legend(fancybox=True, frameon = True, facecolor = 'white')
 plt.xlabel("Time", fontsize = 13)
-plt.savefig('WpWm.png')
+#plt.savefig('WpWm.png')
 plt.close('all')
     
