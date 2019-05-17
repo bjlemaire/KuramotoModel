@@ -10,7 +10,7 @@
 #include <omp.h>
 #include <cfloat>
 
-
+// Constructor - variable initialization and Butcher tables
 rk4::rk4(int N_, double hi_step, double tol, double J_, 
         double K_, int n_intvls_, double barnes_theta_, bool enable_BH_)
         : N(N_), enable_BH(enable_BH_), AA(1.), BB(1.), J(J_), K(K_), 
@@ -43,7 +43,6 @@ rk4::rk4(int N_, double hi_step, double tol, double J_,
               default: break;
             }
           }
-        
         }
 
 rk4::~rk4(){
@@ -53,6 +52,8 @@ rk4::~rk4(){
   zap(xlim); zap(ylim); zap(xlim_next); zap(ylim_next);zap(bnodes_idx);
 }
 
+// Given a particle and a root, find which square (or child node) 
+// the particle belongs to.
 void rk4::find_square(double x, double y, bool nlim){
   bool y_geq = y>ylim[1];
   bool x_leq = x<xlim[1];
@@ -72,6 +73,7 @@ void rk4::find_square(double x, double y, bool nlim){
   ylim_next[2] = nlim*((!y_geq)?ylim[1]:ylim_next[2]) + !nlim * ylim_next[2];
 }
 
+// Create a new node in the Barnes-Hut tree, given the data of a specific swarmalator.
 inline void rk4::push_node(int i, double x_, double y_, double sint_, double cost_){
   // Every new pushed node is a value node.
   barnes_list.push_back(1);
