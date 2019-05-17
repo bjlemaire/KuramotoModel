@@ -27,7 +27,9 @@ class rk4 {
     // a "Root" node and a "Value" node.
     double AA, BB, J, K, h_step, last_h_step, Atol, Rtol, fac, facmin, facmax, T_final,
            dense_stpsze, barnes_theta, minx, maxx, miny, maxy, ox, oy, osint, ocost, oid;
-
+    // N: number of swarmalators.
+    // n_intvls: number of intervals for the dense output.
+    // not_found: 
     // cidx: Current Index
     // fidx: Futur Index
     int N, n_intvls, not_found, location, cidx, fidx, N_child, step_counter, SIZE_LIST;
