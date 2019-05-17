@@ -7,7 +7,7 @@
 #include <omp.h>
 
 int main(){
-  double T_final = 100.0;
+  double T_final = 0.5;
   double hi_step = 1.0;
   double tolerance = 0.000001;
   double J = 0.1;
@@ -17,7 +17,7 @@ int main(){
   double t1 = omp_get_wtime();
   myRk4_1.compute_solution(T_final);
   double t2 = omp_get_wtime();
-  myRk4_1.terminate();
+  printf("Total Computation Time: %f\n", t2-t1);
 
 
   // Produce results for the comparison between
@@ -71,6 +71,5 @@ int main(){
     printf("%f %f %f %f %f %f\n",theta,t2-t1,t4-t3,t6-t5,t8-t7,t10-t9);
   }
 
-  printf("Total Computation Time: %f\n", t2-t1);
   return 0;
 }
