@@ -52,15 +52,22 @@ rk4::~rk4(){
   zap(xlim); zap(ylim); zap(xlim_next); zap(ylim_next);zap(bnodes_idx);
 }
 
-// Given a particle and a root, find which square (or child node) 
-// the particle belongs to.
+/** Given a particle and a root, find which square (or child node) 
+  * the particle belongs to. */
 void rk4::find_square(double x, double y, bool nlim){
   bool y_geq = y>ylim[1];
   bool x_leq = x<xlim[1];
+
+  // Corresponding child node of the swarmalator - the location
+  // value refers to the position of the child node in the node structure (see report
+  // for more explanation).
   location = ( y_geq &&  x_leq)*7
             +( y_geq && !x_leq)*8
             +(!y_geq &&  x_leq)*9
             +(!y_geq && !x_leq)*10;
+
+  // nlim: whether or not we want to update xlim and ylim (shrinking to 
+  // the next subdomain).
   xlim_next[1] = nlim*( (  x_leq *0.5*(xlim[0]+xlim[1]))
                        +((!x_leq)*0.5*(xlim[1]+xlim[2])))
                 + !nlim * xlim_next[1];
@@ -73,7 +80,7 @@ void rk4::find_square(double x, double y, bool nlim){
   ylim_next[2] = nlim*((!y_geq)?ylim[1]:ylim_next[2]) + !nlim * ylim_next[2];
 }
 
-// Create a new node in the Barnes-Hut tree, given the data of a specific swarmalator.
+/** Create a new node in the Barnes-Hut tree, given the data of a specific swarmalator. */
 inline void rk4::push_node(int i, double x_, double y_, double sint_, double cost_){
   // Every new pushed node is a value node.
   barnes_list.push_back(1);
@@ -91,7 +98,8 @@ inline void rk4::push_node(int i, double x_, double y_, double sint_, double cos
   barnes_list.push_back(-1);
 }
 
-
+/** Initialize the limits xlim and ylim as the smallest square
+  * that includes all the swarmalators. */
 inline void rk4::init_lims(){
   double low_  = fmin(minx-0.01*(maxx-minx), miny-0.01*(maxy-miny));
   double high_ = fmax(maxx+0.01*(maxx-minx), maxy+0.01*(maxy-miny));
@@ -107,6 +115,9 @@ inline void rk4::init_lims(){
   }
 }
 
+/** Perform the Barnes-Hut recursive algorithm on a given node - if the node
+  * is a value, add its contribution to the net force. If the node is a root,
+  * see report for algorithm.*/
 void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
                          double &sumx, double &sumy, double &sumtheta, int &N_comp, 
                          double lgth){
@@ -119,6 +130,7 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
   double norm2 = (xi-mx)*(xi-mx) + (yi-my)*(yi-my);
   double norm = sqrt(norm2);
 
+  // If node is a value node.
   if (val==1){
     if (i != pid){
       sumx += ((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2);
@@ -128,12 +140,16 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
     }
   }
   else{
+
+    // If d/s>ø_bh, recursive algorithm on the 4 child nodes.
     if ((lgth/norm)>barnes_theta){
       if (n1!=-1) barnes_compute(n1,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
       if (n2!=-1) barnes_compute(n2,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
       if (n3!=-1) barnes_compute(n3,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
       if (n4!=-1) barnes_compute(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
     }
+
+    // If d/s<ø_bh, add contribution of the node to the net force.
     else{
       sumx += nchd*(((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2));
       sumy += nchd*(((my-yi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((my-yi)/norm2));
@@ -143,6 +159,8 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
   }
 }
 
+
+/** Compute the N-body interactions using the Barnes-Hut algorithm. */
 void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, double* outputX, double* outputY, double* output_theta){
 
   // Create a fresh Barnes-Hut list
@@ -251,6 +269,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
   barnes_list.clear();
 }
 
+/** Compute the N-body interactions using a "brute-force" calculation. */
 void rk4::compute_xx(double t_, double* x_, double* y_, double* theta_, double* outputX, double* outputY, double* output_theta){
 
 #pragma omp parallel for
@@ -516,7 +535,6 @@ void rk4::initialize(){
   srand (static_cast <unsigned> (time(0)));
   float max_xy = 2;
   float max_angle = 2*M_PI;
-  //printf("N=%d\n", N);
   for(int i=0; i<N; i++){
     float x;
     float y;
