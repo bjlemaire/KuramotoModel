@@ -11,11 +11,13 @@
 #include <cfloat>
 
 // Constructor - variable initialization and Butcher tables
-rk4::rk4(int N_, double hi_step, double tol, double J_, 
+rk4::rk4(const int N_, double hi_step, double tol, double J_, 
         double K_, int n_intvls_, double barnes_theta_, bool enable_BH_)
-        : N(N_), enable_BH(enable_BH_), AA(1.), BB(1.), J(J_), K(K_), 
-        step_counter(0), n_intvls(n_intvls_), not_found(1), 
-        barnes_theta(barnes_theta_), SIZE_LIST(11), 
+        : enable_BH(enable_BH_), N(N_), AA(1.), BB(1.), J(J_), K(K_), 
+        h_step(hi_step), last_h_step(hi_step),Atol(tol), Rtol(tol),
+        fac(0.9), facmax(3.), facmin(1./3.),barnes_theta(barnes_theta_),
+        n_intvls(n_intvls_), not_found(1), step_counter(0), 
+        SIZE_LIST(11), 
         x0(new double[N]), y0(new double[N]), theta0(new double[N]), 
         vx0(new double[N]), vy0(new double[N]), omega0(new double[N]),
         x1(new double[N]), y1(new double[N]), theta1(new double[N]),
@@ -23,8 +25,8 @@ rk4::rk4(int N_, double hi_step, double tol, double J_,
         sc_x(new double[N]), sc_y(new double[N]), sc_theta(new double[N]),
         xlim(new double[3]), ylim(new double[3]), 
         xlim_next(new double[3]), ylim_next(new double[3]),
-        bnodes_idx(new double[N]), Rtol(tol), Atol(tol), 
-        fac(0.9), facmax(3.), facmin(1./3.), h_step(hi_step), last_h_step(hi_step),
+        bnodes_idx(new double[N]),  
+         
         A(new double[10]), B(new double[9]), C(new double[5]) {
 
           // Constructing the Butcher tables
