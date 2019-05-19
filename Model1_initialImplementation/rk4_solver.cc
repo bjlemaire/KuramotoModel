@@ -7,8 +7,10 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <omp.h>
 
 void rk4::compute_xx(double t_, double* x_, double* y_, double* theta_, double* outputX, double* outputY, double* output_theta){
+  #pragma omp parallel for
   for (int i=0; i<N; i++){
     outputX[i] = 0.;
     outputY[i] = 0.;
@@ -34,6 +36,7 @@ void rk4::compute_xx(double t_, double* x_, double* y_, double* theta_, double* 
 
 void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
   // First, we calculate G1:
+#pragma omp parallel for
   for(int i=0; i<(N); i++){
     Gs_x[i]=x0[i];
     Gs_x[i+1*N]=x0[i];
@@ -55,6 +58,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   compute_xx(t+C[0]*h_step, x0, y0, theta0, ff_x, ff_y, ff_theta);
 
   // Calculating G2:
+#pragma omp parallel for
   for(int i=0; i<N; i++){
     Gs_x[i+1*N]     += A[0]*h_step*ff_x[i];
     Gs_y[i+1*N]     += A[0]*h_step*ff_y[i];
@@ -79,6 +83,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
 
 
   // Calculating G4:
+#pragma omp parallel for
   for (int i=0; i<N; i++){
     Gs_x[i+3*N]     += A[3]*h_step*ff_x[i];
     Gs_x[i+3*N]     += A[4]*h_step*ff_x[i+1*N];
@@ -96,6 +101,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
 
 
   // Calculating G5:
+#pragma omp parallel for
   for (int i=0; i<N; i++){
     Gs_x[i+4*N]     += A[6]*h_step*ff_x[i];
     Gs_x[i+4*N]     += A[7]*h_step*ff_x[i+1*N];
@@ -173,7 +179,7 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   last_h_step = h_step;
   h_step = h_step * std::min(facmax, std::max(facmin, fac*pow((1./err), (1./4.))));
 
-  printf("Err=%f  -  h_step = %f\n", err, h_step);
+//printf("Err=%f  -  h_step = %f\n", err, h_step);
 
   if (err>1){
     compute_Gs(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);

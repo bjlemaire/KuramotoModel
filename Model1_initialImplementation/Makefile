@@ -1,9 +1,6 @@
 # Load the common configuration file
 include ./config.mk
 
-# iflags=-I./tgmg -I/usr/local/include
-# lflags=-L. -L/usr/local/lib -w -lz -lpng16
-
 objs=rk4_solver.o
 src=$(patsubst %.o,%.cc,$(objs))
 execs=model1
