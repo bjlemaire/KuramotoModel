@@ -325,13 +325,7 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
 }
 
 void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
-  double sc_x[N];
-  double sc_y[N];
-  double sc_theta[N];
   for (int i=0; i<N; i++){
-    sc_x[i] = 0.;
-    sc_y[i] = 0.;
-    sc_theta[i] = 0.;
     x1[i] = 0.;
     y1[i] = 0.;
     theta1[i] = 0.;

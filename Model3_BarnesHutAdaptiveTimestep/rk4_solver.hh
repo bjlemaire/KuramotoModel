@@ -70,7 +70,7 @@ class rk4 {
     // Set the values of Vx, Vy, ω to the ones defined by the author of the code.
     void initialize();
 
-    // Perform the calculation for t=0 to t=T_final.
+    // Perform the calculation from t=0 to t=T_final.
     void compute_solution(double T_final_);
 
   private:
