@@ -10,7 +10,7 @@
 #include <omp.h>
 #include <cfloat>
 
-// Constructor - variable initialization and Butcher tables
+/** Constructor - variable initialization and Butcher tables. */
 rk4::rk4(const int N_, double hi_step, double tol, double J_, 
         double K_, int n_intvls_, double barnes_theta_, bool enable_BH_)
         : enable_BH(enable_BH_), N(N_), AA(1.), BB(1.), J(J_), K(K_), 
@@ -43,6 +43,7 @@ rk4::rk4(const int N_, double hi_step, double tol, double J_,
           }
         }
 
+/** Destructor. */
 rk4::~rk4(){
   zap(x0); zap(y0); zap(theta0); zap(x1); zap(y1); zap(theta1);
   zap(x1h); zap(y1h); zap(theta1h); zap(vx0); zap(vy0); zap(omega0);
@@ -180,7 +181,7 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
   }
   // Initialize xlim, ylim, xlim_next, ylim_next
   init_lims();
-  
+
   for(int i=1; i<N; i++){
     not_found = 1;
     cidx = 0;
@@ -270,14 +271,19 @@ void rk4::smart_compute_xx(double t_, double* x_, double* y_, double* theta_, do
 /** Compute the N-body interactions using a "brute-force" calculation. */
 void rk4::compute_xx(double t_, double* x_, double* y_, double* theta_, double* outputX, double* outputY, double* output_theta){
 
+  // Calculation of the net force exerted on each swarmalator.
 #pragma omp parallel for
   for (int i=0; i<N; i++){
+
+    // Array initialization
     outputX[i] = 0.;
     outputY[i] = 0.;
     output_theta[i] = 0.;
     double sumx = 0.;
     double sumy = 0.;
     double sumtheta = 0.;
+
+    // Brute force calculation of the N-body interactions
     for (int j=0; j<N; j++){
       if (j!=i){
         double norm2 = (x_[j]-x_[i])*(x_[j]-x_[i]) + (y_[j]-y_[i])*(y_[j]-y_[i]);
@@ -293,7 +299,7 @@ void rk4::compute_xx(double t_, double* x_, double* y_, double* theta_, double* 
   }
 }
 
-
+/** Compute the G vectors (see FSAL RK4 method, AM225 lecture slides). */
 void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
   // First, we calculate G1:
 #pragma omp parallel for
@@ -386,10 +392,16 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
   else compute_xx(t+C[4]*h_step, (Gs_x+4*N), (Gs_y+4*N), (Gs_theta+4*N), (ff_x+4*N), (ff_y+4*N), (ff_theta+4*N));
 }
 
+/** Compute y1 and y1h using the Butcher tables and 
+  * the FSAL RK4 numerical integration scheme. */
 void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
+
+  // Initialize the Scaling arrays.
   double* sc_x = new double[N];
   double* sc_y = new double[N];
   double* sc_theta = new double[N];
+
+#pragma omp parallel for
   for (int i=0; i<N; i++){
     sc_x[i] = 0.;
     sc_y[i] = 0.;
@@ -402,6 +414,8 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
     theta1[i] = 0.;
   }
 
+  // Calculate x1, y1, Θ1, and their "hat" values (see FSAL RK4 integration scheme).
+#pragma omp parallel for
   for (int i=0; i<N; i++){
     x1[i]      = x0[i];
     y1[i]      = y0[i];
@@ -417,7 +431,6 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
       theta1[i] += B[j]*h_step*ff_theta[i+j*N];
     }
   }
-
   for (int i=0; i<N; i++){
     for (int j=0; j<5; j++){
       x1h[i] += B[j+4]*h_step*ff_x[i+j*N];
@@ -425,6 +438,8 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
       theta1h[i] += B[j+4]*h_step*ff_theta[i+j*N];
     }
   }
+
+#pragma omp parallel for
   for (int i=0; i<N; i++){
     sc_x[i] = Atol + Rtol * std::max(std::abs(x0[i]), std::abs(x1[i]));
     sc_y[i] = Atol + Rtol * std::max(std::abs(y0[i]), std::abs(y1[i]));
@@ -443,18 +458,22 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   err = sqrt(err);
   last_h_step = h_step;
   h_step = h_step * std::min(facmax, std::max(facmin, fac*pow((1./err), (1./4.))));
-  
 
+  // If error too big, perform new iteration with a smaller timestep.
   if (err>1){
     compute_Gs(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
     compute_y1y1h(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
   }
+  // Else, we accept the current iteration.
   else if (t+last_h_step+h_step>T_final){
     h_step = T_final-(t+last_h_step);
   }
+
+  // Deallocating arrays.
   zap(sc_x); zap(sc_y); zap(sc_theta);
 }
 
+/** Performs 3rd-order Hermite polynomial interpolation to provide dense output. */
 void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
   std::ofstream myDense;
   myDense.open(filenameDense);
@@ -464,16 +483,20 @@ void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
   double* f1_x = new double[N];
   double* f1_y = new double[N];
   double* f1_theta = new double[N];
-  
+
+  // If enable_BH is true, perform integration using Barnes-Hut algorithm.
   if (enable_BH){
     smart_compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
     smart_compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
   }
+
+  // Else, perform integration using brute-force calculation.
   else {
     compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
     compute_xx(actual_t + last_h_step, x1, y1, theta1, f1_x, f1_y, f1_theta);
   }
 
+  // Provide dense output.
   for(int i=0; i<N; i++){
     double u_x = (1-myTheta)*x0[i] + myTheta*x1[i] + myTheta*(myTheta-1)*((1-2*myTheta)*(x1[i]-x0[i]) + (myTheta-1)*last_h_step*f0_x[i]+myTheta*last_h_step*f1_x[i]);
     double u_y = (1-myTheta)*y0[i] + myTheta*y1[i] + myTheta*(myTheta-1)*((1-2*myTheta)*(y1[i]-y0[i]) + (myTheta-1)*last_h_step*f0_y[i]+myTheta*last_h_step*f1_y[i]);
@@ -481,10 +504,13 @@ void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
     myDense<<(actual_t + myTheta*last_h_step)<<" "<<u_x <<" "<< u_y<<" "<<u_theta<<std::endl;
   }
   myDense.close();
+
+  // Array deallocation.
   zap(f0_x); zap(f0_y); zap(f0_theta);
   zap(f1_x); zap(f1_y); zap(f1_theta);
 }
 
+/** Provide a dense output. */
 void rk4::dense_output(double t_){
   int m1=0;
   if (float(int(t_/dense_stpsze)) == t_/dense_stpsze){
@@ -501,6 +527,7 @@ void rk4::dense_output(double t_){
   }
 }
 
+/** Prepare all the variables to pass their values to reinitialize the system. */
 void rk4::nextStep(){
   for(int i=0; i<N; i++){
     x0[i]=x1[i];
@@ -509,6 +536,7 @@ void rk4::nextStep(){
   }
 }
 
+/** Perform the calculation from t=0 to t=T_final. */
 void rk4::compute_solution(double T_final_){
   T_final = T_final_;
   dense_stpsze = double(T_final/double(n_intvls));
@@ -534,6 +562,9 @@ void rk4::compute_solution(double T_final_){
   zap(Gs_theta); zap(ff_theta);
 }
 
+/** Uniformly distribute x,y within a disk of radius 1 centered at the origin
+  * Uniformly distribute Θ between -π and +π
+  * Set the values of Vx, Vy, and ω to the ones defined by the author of the code. */
 void rk4::initialize(){
   srand (static_cast <unsigned> (time(0)));
   float max_xy = 2;

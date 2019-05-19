@@ -1,1 +1,4 @@
-Here we implement the Barnes Hut algorithm with an average sin(theta) and cos(theta)
+Here we implement the Barnes Hut algorithm with
+averaged sin(theta) and cos(theta) and an adaptive
+timestep FSAL Runge-Kutta (4th order) integration
+scheme.
