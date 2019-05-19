@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
-//#define N 1250
 
 class rk4 {
   public:
@@ -25,7 +24,7 @@ class rk4 {
     // -  dense_stpsze: timestep size necessary to obtain the desired dense output
     //                  (obtained from T_final and the number of interval input 
     //                  from the operator).
-    // -  barnes_theta: theta threshold (Barnes-Hut Threshold) for the BH algorithm.
+    // -  barnes_theta: Θ threshold (Barnes-Hut Threshold) for the BH algorithm.
     // -  minx, maxx, miny, maxy:     spatial limits of the N swarmalators.
     // -  ox, oy, osint, ocost, oid:  variables used to turn a "Value" node into 
     //                                a "Root" node and a "Value" node.
@@ -42,17 +41,40 @@ class rk4 {
     // cidx: Current Index
     // fidx: Futur Index
     int n_intvls, not_found, location, cidx, fidx, N_child, step_counter;
+
+    // - A,B,C:             Butcher Tables used for FSAL Runge-Kutta 4th order numerical scheme.
+    // - sc:                Used for adaptive method. See AM225 lecture slides.
+    // - x0,y0,theta0:      Initial values for x,y,Θ (initial meaning before each new timestep).
+    // - vx0, vy0, omega0:  Initial values for velocity along x, y, and ω.
+    // - x1, y1, theta1:    Final values for x,y,Θ (final meaning after each new timestep).
+    // - x1h, y1h, theta1h: Values for x1-hat, y1-hat, and Θ-hat used for adaptive timestep method.
+    // - vx1, vy1, omega1:  Final values for velocity along x, y, and ω.
+    //
+    // - xlim, ylim, xlim_next, ylim_next: Smallest squares including all the swarmalators.
+    //                                     Values along x and y before and after each timestep 
+    //                                     respectively.
     double *A, *B, *C, *sc, *x0, *y0, *theta0, *vx0, *vy0, *omega0, *x1, *y1, *theta1,
-           *x1h, *y1h, *theta1h, *vx1, *vy1, *omega1, *sc_x, *sc_y, *sc_theta, *bnodes_idx,
-           *xlim, *ylim, *xlim_next, *ylim_next;
+           *x1h, *y1h, *theta1h, *vx1, *vy1, *omega1, *xlim, *ylim, *xlim_next, *ylim_next;
+
+    // The Barnes-Hut Tree vector.
     std::vector<double> barnes_list;
-    std::vector<double> bnodes;
+
+    // Constructor.
     rk4(int N_, double hi_step, double tol, double J_, double K_, int n_intvls_, double barnes_theta_, bool enable_BH_);
+
+    // Destructor.
     ~rk4();
+
+    // Uniformly distribute x,y within a disk of radius 1 centered at the origin.
+    // Uniformly distribute Θ between -π and π.
+    // Set the values of Vx, Vy, ω to the ones defined by the author of the code.
     void initialize();
+
+    // Perform the calculation for t=0 to t=T_final.
     void compute_solution(double T_final_);
 
   private:
+
     // Compute the interaction in the system of 
     // equation (right terms) using brute force calculation.
     void compute_xx(double t_, double* x_, double* y_, double* theta_, double* outputX, double* outputY, double* output_theta);
@@ -92,7 +114,11 @@ class rk4 {
     // square containing all the swarmalators).
     inline void init_lims();
 
+    // Given a particle and a Root node, find each square (or Child node) 
+    // the particle belongs to.
     void find_square(double x, double y, bool nlim);
+
+    // Creates a new Value node in the Barnes-Hut tree with the data passed as arguments.
     inline void push_node(int i, double x_, double y_, double sint_, double cost_);
 
 

@@ -15,19 +15,15 @@ rk4::rk4(const int N_, double hi_step, double tol, double J_,
         double K_, int n_intvls_, double barnes_theta_, bool enable_BH_)
         : enable_BH(enable_BH_), N(N_), AA(1.), BB(1.), J(J_), K(K_), 
         h_step(hi_step), last_h_step(hi_step),Atol(tol), Rtol(tol),
-        fac(0.9), facmax(3.), facmin(1./3.),barnes_theta(barnes_theta_),
-        n_intvls(n_intvls_), not_found(1), step_counter(0), 
-        SIZE_LIST(11), 
+        fac(0.9), facmin(1./3.), facmax(3.), barnes_theta(barnes_theta_),
+        SIZE_LIST(11), n_intvls(n_intvls_), not_found(1), step_counter(0), 
+        A(new double[10]), B(new double[9]), C(new double[5]), 
         x0(new double[N]), y0(new double[N]), theta0(new double[N]), 
         vx0(new double[N]), vy0(new double[N]), omega0(new double[N]),
         x1(new double[N]), y1(new double[N]), theta1(new double[N]),
         x1h(new double[N]), y1h(new double[N]), theta1h(new double[N]),
-        sc_x(new double[N]), sc_y(new double[N]), sc_theta(new double[N]),
         xlim(new double[3]), ylim(new double[3]), 
-        xlim_next(new double[3]), ylim_next(new double[3]),
-        bnodes_idx(new double[N]),  
-         
-        A(new double[10]), B(new double[9]), C(new double[5]) {
+        xlim_next(new double[3]), ylim_next(new double[3]) {
 
           // Constructing the Butcher tables
           for(int i=0; i<10; i++){
@@ -50,8 +46,8 @@ rk4::rk4(const int N_, double hi_step, double tol, double J_,
 rk4::~rk4(){
   zap(x0); zap(y0); zap(theta0); zap(x1); zap(y1); zap(theta1);
   zap(x1h); zap(y1h); zap(theta1h); zap(vx0); zap(vy0); zap(omega0);
-  zap(sc_x); zap(sc_y); zap(sc_theta); zap(A); zap(B); zap(C);
-  zap(xlim); zap(ylim); zap(xlim_next); zap(ylim_next);zap(bnodes_idx);
+  zap(A); zap(B); zap(C);
+  zap(xlim); zap(ylim); zap(xlim_next); zap(ylim_next);
 }
 
 /** Given a particle and a root, find which square (or child node) 
@@ -143,7 +139,7 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
   }
   else{
 
-    // If d/s>ø_bh, recursive algorithm on the 4 child nodes.
+    // If d/s>Θ_bh, recursive algorithm on the 4 child nodes.
     if ((lgth/norm)>barnes_theta){
       if (n1!=-1) barnes_compute(n1,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
       if (n2!=-1) barnes_compute(n2,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
@@ -151,7 +147,7 @@ void rk4::barnes_compute(int cidx_, int &i, double xi, double yi, double thi,
       if (n4!=-1) barnes_compute(n4,i,xi,yi,thi,sumx,sumy,sumtheta,N_comp, lgth/2.);
     }
 
-    // If d/s<ø_bh, add contribution of the node to the net force.
+    // If d/s<Θ_bh, add contribution of the node to the net force.
     else{
       sumx += nchd*(((mx-xi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((mx-xi)/norm2));
       sumy += nchd*(((my-yi)/norm)*(AA+J*(cos(thi)*mcos+sin(thi)*msin)) - BB *((my-yi)/norm2));
@@ -391,9 +387,9 @@ void rk4::compute_Gs(double t, double* Gs_x, double* ff_x, double* Gs_y, double*
 }
 
 void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, double* ff_y, double* Gs_theta, double* ff_theta){
-  double sc_x[N];
-  double sc_y[N];
-  double sc_theta[N];
+  double* sc_x = new double[N];
+  double* sc_y = new double[N];
+  double* sc_theta = new double[N];
   for (int i=0; i<N; i++){
     sc_x[i] = 0.;
     sc_y[i] = 0.;
@@ -456,17 +452,18 @@ void rk4::compute_y1y1h(double t, double* Gs_x, double* ff_x, double* Gs_y, doub
   else if (t+last_h_step+h_step>T_final){
     h_step = T_final-(t+last_h_step);
   }
+  zap(sc_x); zap(sc_y); zap(sc_theta);
 }
 
 void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
   std::ofstream myDense;
   myDense.open(filenameDense);
-  double f0_x[N];
-  double f0_y[N];
-  double f0_theta[N];
-  double f1_x[N];
-  double f1_y[N];
-  double f1_theta[N];
+  double* f0_x = new double[N];
+  double* f0_y = new double[N];
+  double* f0_theta = new double[N];
+  double* f1_x = new double[N];
+  double* f1_y = new double[N];
+  double* f1_theta = new double[N];
   
   if (enable_BH){
     smart_compute_xx(actual_t, x0, y0, theta0, f0_x, f0_y, f0_theta);
@@ -484,6 +481,8 @@ void rk4::hermite(double actual_t, double myTheta, char* filenameDense){
     myDense<<(actual_t + myTheta*last_h_step)<<" "<<u_x <<" "<< u_y<<" "<<u_theta<<std::endl;
   }
   myDense.close();
+  zap(f0_x); zap(f0_y); zap(f0_theta);
+  zap(f1_x); zap(f1_y); zap(f1_theta);
 }
 
 void rk4::dense_output(double t_){
@@ -514,12 +513,12 @@ void rk4::compute_solution(double T_final_){
   T_final = T_final_;
   dense_stpsze = double(T_final/double(n_intvls));
   double t=0;
-  double Gs_x[5*N];
-  double ff_x[5*N];
-  double Gs_y[5*N];
-  double ff_y[5*N];
-  double Gs_theta[5*N];
-  double ff_theta[5*N];
+  double* Gs_x = new double[5*N];
+  double* ff_x = new double[5*N];
+  double* Gs_y = new double[5*N];
+  double* ff_y = new double[5*N];
+  double* Gs_theta = new double[5*N];
+  double* ff_theta = new double[5*N];
   initialize();
   while(t<T_final){
     compute_Gs(t, Gs_x, ff_x, Gs_y, ff_y, Gs_theta, ff_theta);
@@ -531,6 +530,8 @@ void rk4::compute_solution(double T_final_){
     nextStep();
   };
   //printf("Done! It tool us %d steps to perform the entire integration.", step_counter);
+  zap(Gs_x); zap(ff_x); zap(Gs_y); zap(ff_y);
+  zap(Gs_theta); zap(ff_theta);
 }
 
 void rk4::initialize(){
