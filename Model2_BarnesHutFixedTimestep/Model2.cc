@@ -20,14 +20,18 @@ int main(){
   double t2 = omp_get_wtime();
   myRk4_1.terminate();
 
-/*
+  // Trying different problem sizes : different total number of swarmalators N.
   for (double N_pwr=3.00; N_pwr<4.10; N_pwr += 0.05 ){
     int NN = (int) pow(10, N_pwr);
+
+    // First, look at the performances of the original method (brute-force)
     rk4 myRk4_norm(NN, hi_step, tolerance, J, K, N_intrvls,0.1,0);
     double t1 = omp_get_wtime();
     myRk4_norm.compute_solution(T_final);
     double t2 = omp_get_wtime();
     myRk4_norm.terminate();
+
+    // Then, look at the performances of the Barnes-Hut enhanced version.
     rk4 myRk4_bh(NN, hi_step, tolerance, J, K, N_intrvls,0.1,1);
     double t3 = omp_get_wtime();
     myRk4_bh.compute_solution(T_final);
@@ -35,10 +39,13 @@ int main(){
     myRk4_bh.terminate();
     printf("%d %f %f\n",NN, t2-t1, t4-t3);
   }
-*/
-/*  
+
+  // Changing the value of the Barnes-Hut Θ parameter.
   for (double pwr=-2; pwr<-0.2; pwr+=0.02){
     double theta = pow(10,pwr);
+
+    // Reiterate the computation 5 different 
+    // times, to obtain statistically relevant data.
     rk4 myRk4_1(hi_step, tolerance, J, K, N_intrvls,theta);
     double t1 = omp_get_wtime();
     myRk4_1.compute_solution(T_final);
@@ -66,7 +73,7 @@ int main(){
     myRk4_5.terminate();
     printf("%f %f %f %f %f %f\n",theta,t2-t1,t4-t3,t6-t5,t8-t7,t10-t9);
   }
-*/
+
   printf("Total Computation Time: %f\n", t2-t1);
   return 0;
 }
