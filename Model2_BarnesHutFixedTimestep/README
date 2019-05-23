@@ -1,1 +1,2 @@
 Here we implement the Barnes Hut algorithm with an average sin(theta) and cos(theta)
+and a fixed timestep FSAL RK4 numerical integration scheme.
